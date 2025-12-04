@@ -1,0 +1,32 @@
+.stats-card {
+  padding: 24rpx;
+  border-radius: var(--radius-lg);
+  background: #fff;
+}
+
+.stats-title {
+  font-size: 24rpx;
+  color: #6b7280;
+}
+
+.stats-value {
+  font-size: 44rpx;
+  font-weight: 600;
+  margin: 16rpx 0;
+}
+
+.stats-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 22rpx;
+  color: #6b7280;
+}
+
+.trend.up {
+  color: #22c55e;
+}
+
+.trend.down {
+  color: #ef4444;
+}

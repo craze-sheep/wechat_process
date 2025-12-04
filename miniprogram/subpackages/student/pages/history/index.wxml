@@ -1,0 +1,86 @@
+<view class="page">
+  <view class="card filter">
+    <picker
+      range="{{semesterOptions}}"
+      value="{{filter.semesterIndex}}"
+      data-field="semesterIndex"
+      bindchange="handleFilterChange"
+    >
+      <view class="picker">{{semesterOptions[filter.semesterIndex]}}</view>
+    </picker>
+    <picker
+      range="{{courseOptions}}"
+      value="{{filter.courseIndex}}"
+      data-field="courseIndex"
+      bindchange="handleFilterChange"
+    >
+      <view class="picker">{{courseOptions[filter.courseIndex]}}</view>
+    </picker>
+    <picker
+      range="{{statusOptions}}"
+      value="{{filter.statusIndex}}"
+      data-field="statusIndex"
+      bindchange="handleFilterChange"
+    >
+      <view class="picker">{{statusOptions[filter.statusIndex]}}</view>
+    </picker>
+  </view>
+
+  <view class="empty" wx:if="{{loading}}">加载中...</view>
+  <view class="empty" wx:elif="{{!displayRecords.length}}">当前条件暂无记录</view>
+  <block wx:else>
+    <view class="card record" wx:for="{{displayRecords}}" wx:key="id" data-id="{{item.id}}">
+      <view class="row">
+        <view class="course">{{item.course}}</view>
+        <view class="status {{item.status}}">
+          {{
+            item.status === 'normal'
+              ? '正常'
+              : item.status === 'late'
+              ? '迟到'
+              : item.status === 'absent'
+              ? '缺勤'
+              : '已补签'
+          }}
+        </view>
+      </view>
+      <view class="meta">{{item.time}} · {{item.location}}</view>
+      <view class="meta">验证方式：{{item.mode}}</view>
+      <view class="actions">
+        <button size="mini" data-id="{{item.id}}" bindtap="handleRecordTap">查看详情</button>
+        <button
+          wx:if="{{item.canMakeup}}"
+          size="mini"
+          type="primary"
+          data-course="{{item.course}}"
+          data-time="{{item.time}}"
+          bindtap="handleMakeup"
+        >
+          补签
+        </button>
+      </view>
+    </view>
+  </block>
+
+  <view class="card summary-card">
+    <view class="summary-title">统计</view>
+    <view class="summary-grid">
+      <view>
+        <view class="label">总次数</view>
+        <view class="value">{{summary.total}}</view>
+      </view>
+      <view>
+        <view class="label">正常</view>
+        <view class="value">{{summary.normal}}</view>
+      </view>
+      <view>
+        <view class="label">迟到</view>
+        <view class="value warn">{{summary.late}}</view>
+      </view>
+      <view>
+        <view class="label">缺勤</view>
+        <view class="value danger">{{summary.absent}}</view>
+      </view>
+    </view>
+  </view>
+</view>

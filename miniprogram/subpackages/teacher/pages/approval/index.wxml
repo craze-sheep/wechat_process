@@ -1,0 +1,45 @@
+<view class="page">
+  <view class="card filters">
+    <picker range="{{statusOptions}}" value="{{statusIndex}}" bindchange="handleStatusChange">
+      <view class="picker">{{statusOptions[statusIndex]}}</view>
+    </picker>
+    <picker range="{{courseOptions}}" value="{{courseIndex}}" bindchange="handleCourseChange">
+      <view class="picker">{{courseOptions[courseIndex]}}</view>
+    </picker>
+  </view>
+
+  <view class="empty" wx:if="{{loading}}">加载中...</view>
+  <view class="empty" wx:elif="{{!displayApprovals.length}}">暂无补签申请</view>
+  <block wx:else>
+    <view class="card" wx:for="{{displayApprovals}}" wx:key="id">
+      <view class="header">
+        <view class="student">{{item.student}}</view>
+        <view class="status {{item.status}}">
+          {{item.status === 'pending' ? '待审批' : item.status === 'approved' ? '已通过' : '已驳回'}}
+        </view>
+      </view>
+      <view class="course">{{item.course}}</view>
+      <view class="reason">{{item.reason}}</view>
+      <view class="time">提交时间：{{item.submittedAt}}</view>
+      <view class="actions">
+        <button size="mini" data-id="{{item.id}}" bindtap="handleViewDetail">查看详情</button>
+        <view wx:if="{{item.status === 'pending'}}">
+          <button size="mini" type="primary" data-id="{{item.id}}" bindtap="handleApprove">通过</button>
+          <button size="mini" type="warn" data-id="{{item.id}}" bindtap="handleReject">驳回</button>
+        </view>
+      </view>
+    </view>
+  </block>
+
+  <view wx:if="{{detailVisible}}" class="detail-mask">
+    <view class="detail-panel">
+      <view class="detail-title">{{currentDetail.course}}</view>
+      <view class="detail-row">学生：{{currentDetail.student}}</view>
+      <view class="detail-row">类型：{{currentDetail.type}}</view>
+      <view class="detail-row">提交时间：{{currentDetail.submittedAt}}</view>
+      <view class="detail-row">理由：{{currentDetail.reason}}</view>
+      <view class="detail-row" wx:if="{{currentDetail.evidence}}">附件：{{currentDetail.evidence}}</view>
+      <button type="default" size="mini" bindtap="handleCloseDetail">关闭</button>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,55 @@
+<view class="page">
+  <view class="toolbar">
+    <button size="mini" bindtap="handleToggleSelect">{{selecting ? '取消选择' : '批量选择'}}</button>
+    <button size="mini" type="primary" bindtap="handleBulkResolve" wx:if="{{selecting}}">批量标记已处理</button>
+  </view>
+
+  <view class="card filter">
+    <picker range="{{levelOptions}}" value="{{levelIndex}}" bindchange="handleLevelChange">
+      <view class="picker">{{levelOptions[levelIndex]}}</view>
+    </picker>
+  </view>
+
+  <checkbox-group bindchange="handleSelectChange">
+    <view
+      class="card alert"
+      wx:for="{{displayList}}"
+      wx:key="id"
+      data-id="{{item.studentId}}"
+      bindtap="handleStudentTap"
+    >
+      <view class="row">
+        <view class="name">{{item.student}} · {{item.clazz}}</view>
+        <view class="level {{item.level}}">
+          {{item.level === 'serious' ? '严重' : '关注'}}
+        </view>
+      </view>
+      <view class="reason">{{item.reason}}</view>
+      <view class="time">最近缺勤：{{item.lastAbsence}}</view>
+      <view class="actions">
+        <checkbox
+          wx:if="{{selecting}}"
+          value="{{item.id || item.alertId || item.studentId}}"
+          checked="{{selectedIds.indexOf(item.id || item.alertId || item.studentId) > -1}}"
+        />
+        <button
+          size="mini"
+          type="default"
+          data-id="{{item.id || item.alertId || item.studentId}}"
+          catchtap="handleResolveSingle"
+        >
+          标记已处理
+        </button>
+        <button
+          size="mini"
+          type="primary"
+          data-id="{{item.studentId}}"
+          data-student="{{item.student}}"
+          catchtap="handleContact"
+        >
+          记录联系
+        </button>
+      </view>
+    </view>
+  </checkbox-group>
+</view>

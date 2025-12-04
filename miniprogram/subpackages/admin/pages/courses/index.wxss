@@ -1,0 +1,28 @@
+.page {
+  padding: 24rpx;
+}
+
+.course {
+  margin-bottom: 16rpx;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8rpx;
+}
+
+.name {
+  font-size: 30rpx;
+  font-weight: 600;
+}
+
+.mode {
+  font-size: 24rpx;
+  color: #4b5563;
+}
+
+.meta {
+  font-size: 24rpx;
+  color: #6b7280;
+}

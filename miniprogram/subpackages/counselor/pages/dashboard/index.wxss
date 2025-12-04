@@ -1,0 +1,85 @@
+.page {
+  padding: 24rpx;
+}
+
+.head {
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+}
+
+.head-actions {
+  display: flex;
+  gap: 12rpx;
+}
+
+.title {
+  font-size: 34rpx;
+  font-weight: 600;
+}
+
+.subtitle {
+  color: #4b5563;
+}
+
+.filters {
+  display: flex;
+  gap: 12rpx;
+  margin: 16rpx 0;
+}
+
+.filters .picker {
+  flex: 1;
+  background: #f3f4f6;
+  padding: 18rpx;
+  border-radius: 12rpx;
+}
+
+.stats-grid {
+  margin-top: 16rpx;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16rpx;
+}
+
+.class-list .row {
+  display: flex;
+  justify-content: space-between;
+  padding: 20rpx 0;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.class-list .row:last-child {
+  border-bottom: none;
+}
+
+.name {
+  font-size: 30rpx;
+  font-weight: 500;
+}
+
+.rate {
+  color: #6b7280;
+  margin-top: 6rpx;
+}
+
+.tag {
+  padding: 6rpx 18rpx;
+  border-radius: 999rpx;
+  font-size: 24rpx;
+}
+
+.tag.good {
+  background: rgba(34, 197, 94, 0.12);
+  color: #15803d;
+}
+
+.tag.warn {
+  background: rgba(251, 191, 36, 0.16);
+  color: #b45309;
+}
+
+.tag.risk {
+  background: rgba(239, 68, 68, 0.16);
+  color: #b91c1c;
+}

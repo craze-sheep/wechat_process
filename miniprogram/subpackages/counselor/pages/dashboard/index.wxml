@@ -1,0 +1,44 @@
+<view class="page">
+  <view class="card head">
+    <view class="title">{{overview.grade || '辅导员大盘'}}</view>
+    <view class="subtitle">整体出勤率 {{overview.overallRate}}</view>
+    <view class="meta">较上周 {{overview.trend}}</view>
+    <view class="head-actions">
+      <button size="mini" bindtap="handleViewAlerts">查看预警</button>
+      <button size="mini" type="primary" bindtap="handleQuickMakeup">特殊补签</button>
+    </view>
+  </view>
+
+  <view class="card filters">
+    <picker range="{{gradeOptions}}" value="{{filters.gradeIndex}}" data-field="gradeIndex" bindchange="handleFilterChange">
+      <view class="picker">{{gradeOptions[filters.gradeIndex]}}</view>
+    </picker>
+    <picker range="{{majorOptions}}" value="{{filters.majorIndex}}" data-field="majorIndex" bindchange="handleFilterChange">
+      <view class="picker">{{majorOptions[filters.majorIndex]}}</view>
+    </picker>
+    <picker range="{{classOptions}}" value="{{filters.classIndex}}" data-field="classIndex" bindchange="handleFilterChange">
+      <view class="picker">{{classOptions[filters.classIndex]}}</view>
+    </picker>
+  </view>
+
+  <section-header title="关键指标"></section-header>
+  <view class="stats-grid">
+    <stats-card title="出勤率" value="{{overview.overallRate}}" description="本周整体"></stats-card>
+    <stats-card title="迟到人次" value="{{overview.lateCount}}" description="本周累计"></stats-card>
+    <stats-card title="缺勤人次" value="{{overview.absentCount}}" description="本周累计"></stats-card>
+    <stats-card title="预警学生" value="{{overview.alerts}}" description="需跟进"></stats-card>
+  </view>
+
+  <section-header title="班级情况" action-text="刷新" bindaction="loadOverview"></section-header>
+  <view class="class-list card">
+    <view class="row" wx:for="{{overview.classes}}" wx:key="name">
+      <view>
+        <view class="name">{{item.name}}</view>
+        <view class="rate">{{item.rate}}</view>
+      </view>
+      <view class="tag {{item.status}}">
+        {{item.status === 'good' ? '良好' : item.status === 'warn' ? '需关注' : '预警'}}
+      </view>
+    </view>
+  </view>
+</view>

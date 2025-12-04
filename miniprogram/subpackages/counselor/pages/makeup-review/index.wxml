@@ -1,0 +1,25 @@
+<view class="page">
+  <view class="card filter">
+    <picker range="{{statusOptions}}" value="{{statusIndex}}" bindchange="handleStatusChange">
+      <view class="picker">{{statusOptions[statusIndex]}}</view>
+    </picker>
+  </view>
+
+  <view class="empty" wx:if="{{loading}}">加载中...</view>
+  <view class="empty" wx:elif="{{!displayList.length}}">暂无特殊补签申请</view>
+  <block wx:else>
+    <view class="card request" wx:for="{{displayList}}" wx:key="id">
+      <view class="header">
+        <view class="student">{{item.student}}</view>
+        <view class="type">{{item.type}}</view>
+      </view>
+      <view class="meta">课程：{{item.course}}</view>
+      <view class="meta">提交：{{item.submittedAt}}</view>
+      <view class="meta">理由：{{item.reason}}</view>
+      <view class="actions">
+        <button size="mini" type="primary" data-id="{{item.id}}" bindtap="handleApprove">通过</button>
+        <button size="mini" type="warn" data-id="{{item.id}}" bindtap="handleReject">驳回</button>
+      </view>
+    </view>
+  </block>
+</view>

@@ -1,0 +1,91 @@
+.page {
+  padding: 32rpx;
+}
+
+.hero {
+  margin-bottom: 32rpx;
+  background: linear-gradient(135deg, #2c7cf1, #65a9ff);
+  color: #fff;
+}
+
+.hero-title {
+  font-size: 36rpx;
+  font-weight: 600;
+  margin-bottom: 12rpx;
+}
+
+.hero-desc {
+  font-size: 26rpx;
+  opacity: 0.9;
+}
+
+.login-row {
+  margin-top: 20rpx;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.login-text {
+  font-size: 26rpx;
+}
+
+.role-card {
+  margin-bottom: 24rpx;
+}
+
+.role-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12rpx;
+}
+
+.role-title {
+  font-size: 32rpx;
+  font-weight: 600;
+}
+
+.role-badge {
+  padding: 4rpx 16rpx;
+  border-radius: 999rpx;
+  font-size: 24rpx;
+}
+
+.badge-ready {
+  background: rgba(44, 124, 241, 0.12);
+  color: #2c7cf1;
+}
+
+.badge-todo {
+  background: rgba(31, 35, 41, 0.08);
+  color: #6b7280;
+}
+
+.role-desc {
+  font-size: 26rpx;
+  color: #4b5563;
+  margin-bottom: 16rpx;
+}
+
+.role-footer {
+  display: flex;
+  align-items: center;
+  font-size: 24rpx;
+  color: #6b7280;
+}
+
+.status-dot {
+  width: 12rpx;
+  height: 12rpx;
+  border-radius: 50%;
+  margin-right: 12rpx;
+}
+
+.status-dot.ready {
+  background: #34d399;
+}
+
+.status-dot.todo {
+  background: #fbbf24;
+}

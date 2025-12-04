@@ -1,0 +1,53 @@
+{
+  "cloud": true,
+  "pages": [
+    "pages/index/index"
+  ],
+  "subPackages": [
+    {
+      "root": "subpackages/student",
+      "pages": [
+        "pages/home/index",
+        "pages/sign/index",
+        "pages/makeup/index",
+        "pages/history/index"
+      ]
+    },
+    {
+      "root": "subpackages/teacher",
+      "pages": [
+        "pages/courses/index",
+        "pages/sign-launch/index",
+        "pages/sign-monitor/index",
+        "pages/approval/index",
+        "pages/course-detail/index"
+      ]
+    },
+    {
+      "root": "subpackages/counselor",
+      "pages": [
+        "pages/dashboard/index",
+        "pages/alerts/index",
+        "pages/student-detail/index",
+        "pages/makeup-review/index"
+      ]
+    },
+    {
+      "root": "subpackages/admin",
+      "pages": [
+        "pages/users/index",
+        "pages/courses/index",
+        "pages/settings/index"
+      ]
+    }
+  ],
+  "window": {
+    "navigationBarTitleText": "智能考勤",
+    "navigationBarBackgroundColor": "#ffffff",
+    "navigationBarTextStyle": "black",
+    "backgroundTextStyle": "light",
+    "backgroundColor": "#f5f6f8"
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

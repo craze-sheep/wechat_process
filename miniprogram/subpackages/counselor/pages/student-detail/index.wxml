@@ -1,0 +1,55 @@
+<view class="page">
+  <view class="card section">
+    <view class="section-title">基本信息</view>
+    <view class="item">姓名：{{detail.base.name}}</view>
+    <view class="item">班级：{{detail.base.clazz}}</view>
+    <view class="item">联系方式：{{detail.base.phone}}</view>
+    <view class="item">家长：{{detail.base.guardian}}</view>
+  </view>
+
+  <view class="card section">
+    <view class="section-title">出勤统计</view>
+    <view class="stats-row">
+      <view class="stats-item">
+        <view class="label">总课次</view>
+        <view class="value">{{detail.stats.total}}</view>
+      </view>
+      <view class="stats-item">
+        <view class="label">正常</view>
+        <view class="value">{{detail.stats.normal}}</view>
+      </view>
+      <view class="stats-item">
+        <view class="label">迟到</view>
+        <view class="value">{{detail.stats.late}}</view>
+      </view>
+      <view class="stats-item">
+        <view class="label">缺勤</view>
+        <view class="value warn">{{detail.stats.absent}}</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="card section">
+    <view class="section-title">跟进记录</view>
+    <textarea
+      class="followup-input"
+      placeholder="记录新的跟进内容"
+      value="{{followupText}}"
+      bindinput="handleFollowupInput"
+    ></textarea>
+    <button type="primary" size="mini" loading="{{followupLoading}}" bindtap="handleAddFollowup">添加跟进</button>
+    <view class="timeline" wx:for="{{detail.followups}}" wx:key="time">
+      <view class="time">{{item.time}}</view>
+      <view class="content">{{item.content}}</view>
+      <view class="owner">负责人：{{item.owner}}</view>
+    </view>
+  </view>
+
+  <view class="card section">
+    <view class="section-title">近期记录</view>
+    <view class="timeline" wx:for="{{detail.timeline}}" wx:key="date">
+      <view class="content">{{item.date}} · {{item.course}}</view>
+      <view class="owner">状态：{{item.status}}</view>
+    </view>
+  </view>
+</view>

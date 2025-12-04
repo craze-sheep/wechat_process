@@ -1,0 +1,65 @@
+<view class="page">
+  <view class="card summary-card">
+    <view class="title">{{monitor.courseName}}</view>
+    <view class="meta">批次 {{monitor.batchId}} · 模式 {{monitor.mode}}</view>
+    <view class="meta">总人数 {{monitor.total}} · 已签到 {{monitor.signed}}</view>
+    <view class="progress-ring">
+      <view class="circle" style="background: conic-gradient(#2563eb {{progress}}%, #e5e7eb 0);">
+        <view class="percent">{{progress}}%</view>
+        <view class="count">{{monitor.signed}} / {{monitor.total}}</view>
+      </view>
+      <view class="detail">
+        <view>未签到：{{monitor.total - monitor.signed}}</view>
+        <view>二维码 {{monitor.qrExpiredIn}}s 后刷新</view>
+        <view>自动结束：{{monitor.autoCloseMinutes}} 分钟</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="card qr-card">
+    <view class="qr-placeholder">动态二维码</view>
+    <view class="qr-tip">请保持屏幕亮度，防截图传播</view>
+    <view class="qr-bar">
+      <button size="mini" bindtap="handleRefresh">{{refreshing ? '刷新中' : '刷新状态'}}</button>
+      <button size="mini" type="primary" bindtap="handleRemind">提醒未签到</button>
+      <button size="mini" bindtap="handleExtendTime">延长时间</button>
+      <button size="mini" type="warn" bindtap="handleEndSign">结束签到</button>
+    </view>
+  </view>
+
+  <view class="tabs card">
+    <view
+      class="tab {{activeTab === item.key ? 'active' : ''}}"
+      wx:for="{{tabOptions}}"
+      wx:key="key"
+      data-key="{{item.key}}"
+      bindtap="handleTabChange"
+    >
+      {{item.label}}
+    </view>
+  </view>
+
+  <view class="list card" wx:if="{{activeTab === 'signed'}}">
+    <view class="row" wx:for="{{monitor.studentsSigned}}" wx:key="name">
+      <view>{{item.name}}</view>
+      <view class="status normal">{{item.status}} · {{item.time}}</view>
+    </view>
+    <view class="empty" wx:if="{{!monitor.studentsSigned.length}}">暂未有人签到</view>
+  </view>
+
+  <view class="list card" wx:elif="{{activeTab === 'pending'}}">
+    <view class="row" wx:for="{{monitor.studentsPending}}" wx:key="name">
+      <view>{{item.name}}</view>
+      <view class="status danger">{{item.status}}</view>
+    </view>
+    <view class="empty" wx:if="{{!monitor.studentsPending.length}}">暂无未签到学生</view>
+  </view>
+
+  <view class="list card" wx:else>
+    <view class="row" wx:for="{{monitor.abnormal}}" wx:key="name">
+      <view>{{item.name}}</view>
+      <view class="status warn">{{item.reason || item.status}}</view>
+    </view>
+    <view class="empty" wx:if="{{!monitor.abnormal || !monitor.abnormal.length}}">暂无异常记录</view>
+  </view>
+</view>

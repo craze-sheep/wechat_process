@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "今日课堂",
+  "usingComponents": {
+    "section-header": "/components/section-header/index",
+    "stats-card": "/components/stats-card/index"
+  }
+}

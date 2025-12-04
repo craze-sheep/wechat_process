@@ -1,0 +1,47 @@
+.page {
+  padding: 24rpx;
+}
+
+.filter .picker {
+  background: #f3f4f6;
+  padding: 18rpx;
+  border-radius: 12rpx;
+  margin-bottom: 20rpx;
+}
+
+.request {
+  margin-bottom: 20rpx;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8rpx;
+}
+
+.student {
+  font-size: 30rpx;
+  font-weight: 600;
+}
+
+.type {
+  color: #2563eb;
+}
+
+.meta {
+  color: #6b7280;
+  margin-bottom: 6rpx;
+}
+
+.actions {
+  margin-top: 12rpx;
+  display: flex;
+  gap: 12rpx;
+}
+
+.empty {
+  text-align: center;
+  color: #9ca3af;
+  padding: 60rpx 0;
+}

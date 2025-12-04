@@ -1,0 +1,63 @@
+<view class="page">
+  <view class="card info-card" wx:if="{{courseInfo}}">
+    <view class="title">{{courseInfo.name}}</view>
+    <view class="meta">{{courseInfo.time}}</view>
+    <view class="meta">地点：{{courseInfo.location}}</view>
+  </view>
+
+  <view class="card form-card">
+    <view class="field">
+      <view class="label">课程名称 *</view>
+      <input placeholder="如：高等数学" data-field="course" value="{{form.course}}" bindinput="handleInput" />
+    </view>
+    <view class="field">
+      <view class="label">请假类型 *</view>
+      <radio-group class="type-group" bindchange="handleTypeChange">
+        <label class="type-item" wx:for="{{types}}" wx:key="item">
+          <radio value="{{item}}" checked="{{item === form.type}}" />{{item}}
+        </label>
+      </radio-group>
+    </view>
+    <view class="field">
+      <view class="label">详细说明 *</view>
+      <textarea
+        placeholder="请说明情况（10-200字）"
+        maxlength="200"
+        data-field="reason"
+        value="{{form.reason}}"
+        bindinput="handleInput"
+      />
+      <view class="word-count">{{wordCount}} / 200</view>
+    </view>
+    <view class="field">
+      <view class="label">证明材料</view>
+      <view class="upload-grid">
+        <view class="upload-thumb" wx:for="{{attachments}}" wx:key="id">
+          <image src="{{item.path}}" mode="aspectFill" bindtap="handlePreviewAttachment" data-url="{{item.path}}" />
+          <view class="remove" bindtap="handleRemoveAttachment" data-id="{{item.id}}">×</view>
+        </view>
+        <view class="upload-add" wx:if="{{attachments.length < 6}}" bindtap="handleUploadEvidence">
+          <view class="plus">+</view>
+          <view class="desc">上传</view>
+        </view>
+      </view>
+    </view>
+    <button type="primary" loading="{{submitting}}" bindtap="handleSubmit">提交补签申请</button>
+  </view>
+
+  <section-header title="申请记录"></section-header>
+  <view class="empty" wx:if="{{loadingRecords}}">加载中...</view>
+  <view class="empty" wx:elif="{{!records.length}}">暂无记录</view>
+  <block wx:else>
+    <view class="record card" wx:for="{{records}}" wx:key="id" data-id="{{item.id}}" bindtap="handleRecordTap">
+      <view class="record-header">
+        <view class="course">{{item.course}}</view>
+        <view class="status {{item.status}}">
+          {{ item.status === 'approved' ? '已通过' : item.status === 'pending' ? '待审批' : '已驳回' }}
+        </view>
+      </view>
+      <view class="detail">{{item.date}} · {{item.reason}}</view>
+      <view class="detail">审批人：{{item.approver}}</view>
+    </view>
+  </block>
+</view>

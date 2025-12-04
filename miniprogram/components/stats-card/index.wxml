@@ -1,0 +1,10 @@
+<view class="stats-card">
+  <view class="stats-title">{{title}}</view>
+  <view class="stats-value">{{value}}</view>
+  <view class="stats-footer">
+    <view class="trend {{trendType}}">
+      <text wx:if="{{trend}}">{{trend}}</text>
+    </view>
+    <view class="desc">{{description}}</view>
+  </view>
+</view>

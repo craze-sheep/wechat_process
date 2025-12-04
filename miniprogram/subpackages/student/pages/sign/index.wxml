@@ -1,0 +1,84 @@
+<view class="page">
+  <view class="card info">
+    <view class="title">{{task.name}}</view>
+    <view class="meta">{{task.teacher}} · {{task.location}}</view>
+    <view class="deadline">{{task.deadline}} · {{task.mode}}</view>
+  </view>
+
+  <view class="card countdown-card">
+    <view class="countdown-label">签到剩余时间</view>
+    <view class="countdown-value">{{countdownText}}</view>
+    <view class="countdown-tip">超时将自动记为迟到/缺勤</view>
+  </view>
+
+  <view class="card progress-card">
+    <view class="progress-head">
+      <view>验证进度</view>
+      <view class="progress-percent">{{progress}}%</view>
+    </view>
+    <view class="progress-bar">
+      <view class="progress-inner" style="width: {{progress}}%;"></view>
+    </view>
+    <view class="progress-desc">完成所有验证步骤后再提交签到</view>
+  </view>
+
+  <view class="card location-card">
+    <view class="label">定位状态</view>
+    <view class="status {{locationStatus}}">
+      {{
+        locationStatus === 'success'
+          ? '已在教室范围'
+          : locationStatus === 'warning'
+          ? '距离较远'
+          : locationStatus === 'error'
+          ? '定位失败'
+          : '定位中'
+      }}
+    </view>
+    <view class="distance">距离教室：{{locationDistance}}</view>
+    <button size="mini" class="retry" bindtap="handleRetryLocation">重新定位</button>
+  </view>
+
+  <section-header title="签到要求"></section-header>
+  <view class="card requirement-card">
+    <view class="row">
+      <view class="dot done"></view>
+      <view>定位验证</view>
+      <view class="desc">需在教室 50 米范围内</view>
+    </view>
+    <view class="row">
+      <view class="dot todo"></view>
+      <view>扫码签到</view>
+      <view class="desc">扫描教师端动态二维码</view>
+    </view>
+    <view class="row">
+      <view class="dot {{task.faceRequired ? 'todo' : 'skip'}}"></view>
+      <view>人脸识别</view>
+      <view class="desc">{{task.faceRequired ? '需完成活体检测' : '本次无需人脸'}}</view>
+    </view>
+  </view>
+
+  <section-header title="验证流程"></section-header>
+  <view class="steps card">
+    <view class="step" wx:for="{{task.steps}}" wx:key="title">
+      <view class="marker {{item.status}}"></view>
+      <view class="step-info">
+        <view class="step-title">{{item.title}}</view>
+        <view class="step-status">
+          {{ item.status === 'done' ? '已完成' : item.status === 'pending' ? '待完成' : '跳过' }}
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view wx:if="{{resultBanner}}" class="card result {{resultBanner.type}}">
+    {{resultBanner.text}}
+  </view>
+
+  <section-header title="操作"></section-header>
+  <view class="actions card">
+    <button type="primary" bindtap="handleScan">扫描二维码</button>
+    <button wx:if="{{task.faceRequired}}" type="primary" class="btn-secondary" bindtap="handleFace">人脸识别</button>
+    <button type="primary" loading="{{submitting}}" bindtap="handleSubmit">提交签到</button>
+  </view>
+</view>

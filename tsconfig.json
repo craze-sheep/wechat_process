@@ -1,0 +1,33 @@
+{
+  "compilerOptions": {
+    "module": "es6",
+    "target": "es5",
+    "moduleResolution": "node",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": [
+        "miniprogram/*"
+      ],
+      "@utils/*": [
+        "miniprogram/utils/*"
+      ],
+      "@store/*": [
+        "miniprogram/store/*"
+      ],
+      "@components/*": [
+        "miniprogram/components/*"
+      ]
+    },
+    "types": [
+      "miniprogram-api-typings"
+    ],
+    "allowJs": true,
+    "checkJs": false,
+    "strict": true,
+    "noEmit": true
+  },
+  "include": [
+    "miniprogram/**/*.ts",
+    "miniprogram/**/*.js"
+  ]
+}

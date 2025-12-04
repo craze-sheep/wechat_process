@@ -1,0 +1,42 @@
+<view class="page">
+  <view class="card filter">
+    <picker range="{{termOptions}}" value="{{termIndex}}" bindchange="handleTermChange">
+      <view class="picker">{{termOptions[termIndex]}}</view>
+    </picker>
+    <input placeholder="搜索课程/班级" value="{{keyword}}" bindinput="handleInput" />
+  </view>
+
+  <view class="card stats-card">
+    <view class="stat">
+      <view class="label">课程数</view>
+      <view class="value">{{stats.totalCourses}}</view>
+    </view>
+    <view class="stat">
+      <view class="label">覆盖学生</view>
+      <view class="value">{{stats.studentTotal}}</view>
+    </view>
+    <view class="stat">
+      <view class="label">平均出勤率</view>
+      <view class="value">{{stats.averageRate}}</view>
+    </view>
+  </view>
+
+  <section-header title="课程列表"></section-header>
+  <view wx:for="{{displayCourses}}" wx:key="id" class="course card">
+    <view class="header">
+      <view>
+        <view class="name">{{item.name}}</view>
+        <view class="clazz">{{item.clazz}} · {{item.schedule}}</view>
+      </view>
+      <view class="rate">{{item.attendanceRate}}</view>
+    </view>
+    <view class="meta">开课学期：{{item.term}}</view>
+    <view class="footer">
+      <view class="location">{{item.location}}</view>
+      <view class="actions">
+        <button size="mini" data-id="{{item.id}}" data-name="{{item.name}}" bindtap="handleStartSign">发起签到</button>
+        <button size="mini" data-id="{{item.id}}" data-name="{{item.name}}" bindtap="handleViewStats">查看统计</button>
+      </view>
+    </view>
+  </view>
+</view>

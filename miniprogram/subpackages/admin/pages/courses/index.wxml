@@ -1,0 +1,10 @@
+<view class="page">
+  <view class="card course" wx:for="{{list}}" wx:key="id">
+    <view class="row">
+      <view class="name">{{item.name}}</view>
+      <view class="mode">{{item.defaultMode}}</view>
+    </view>
+    <view class="meta">授课教师：{{item.teacher}}</view>
+    <view class="meta">班级：{{item.clazz}}</view>
+  </view>
+</view>

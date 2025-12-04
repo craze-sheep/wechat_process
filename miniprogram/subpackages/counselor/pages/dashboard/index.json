@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "辅导员大盘",
+  "usingComponents": {
+    "section-header": "/components/section-header/index",
+    "stats-card": "/components/stats-card/index"
+  }
+}

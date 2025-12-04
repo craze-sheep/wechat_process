@@ -1,0 +1,56 @@
+.page {
+  padding: 24rpx;
+}
+
+.course-card {
+  margin-bottom: 20rpx;
+}
+
+.course-card .title {
+  font-size: 32rpx;
+  font-weight: 600;
+}
+
+.course-card .meta,
+.course-card .location {
+  color: #6b7280;
+  margin-top: 8rpx;
+  font-size: 24rpx;
+}
+
+.form-card .field {
+  margin-bottom: 28rpx;
+}
+
+.label {
+  font-size: 26rpx;
+  margin-bottom: 10rpx;
+  color: #374151;
+}
+
+.picker {
+  padding: 20rpx;
+  background: #f3f4f6;
+  border-radius: var(--radius-md);
+}
+
+.hint {
+  margin-top: 6rpx;
+  color: #9ca3af;
+  font-size: 22rpx;
+}
+
+.value {
+  text-align: right;
+  color: #6b7280;
+  font-size: 24rpx;
+  margin-top: 4rpx;
+}
+
+textarea {
+  width: 100%;
+  border: 1px solid #e5e7eb;
+  border-radius: 12rpx;
+  padding: 16rpx;
+  min-height: 120rpx;
+}

@@ -1,0 +1,16 @@
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 24rpx 0 16rpx;
+}
+
+.title {
+  font-size: 28rpx;
+  font-weight: 600;
+}
+
+.action {
+  font-size: 24rpx;
+  color: #2c7cf1;
+}

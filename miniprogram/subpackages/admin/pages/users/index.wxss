@@ -1,0 +1,52 @@
+.page {
+  padding: 24rpx;
+}
+
+.search input {
+  padding: 20rpx;
+  background: #f3f4f6;
+  border-radius: var(--radius-md);
+}
+
+.user {
+  margin-top: 16rpx;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6rpx;
+}
+
+.name {
+  font-size: 30rpx;
+  font-weight: 600;
+}
+
+.role {
+  font-size: 24rpx;
+  color: #6b7280;
+}
+
+.meta {
+  font-size: 24rpx;
+  color: #6b7280;
+}
+
+.status {
+  margin-top: 8rpx;
+  width: fit-content;
+  padding: 4rpx 12rpx;
+  border-radius: 999rpx;
+  font-size: 22rpx;
+}
+
+.status.active {
+  background: rgba(34, 197, 94, 0.16);
+  color: #15803d;
+}
+
+.status.inactive {
+  background: rgba(148, 163, 184, 0.24);
+  color: #475569;
+}

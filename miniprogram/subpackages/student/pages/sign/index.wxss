@@ -1,0 +1,209 @@
+.page {
+  padding: 24rpx;
+}
+
+.info .title {
+  font-size: 34rpx;
+  font-weight: 600;
+}
+
+.info .meta,
+.info .deadline {
+  color: #6b7280;
+  margin-top: 8rpx;
+}
+
+.countdown-card,
+.progress-card,
+.location-card,
+.requirement-card {
+  margin-top: 20rpx;
+}
+
+.countdown-label {
+  color: #6b7280;
+  font-size: 24rpx;
+}
+
+.countdown-value {
+  font-size: 48rpx;
+  font-weight: 700;
+  margin-top: 12rpx;
+}
+
+.countdown-tip {
+  color: #9ca3af;
+  font-size: 24rpx;
+  margin-top: 4rpx;
+}
+
+.progress-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 600;
+}
+
+.progress-percent {
+  color: #2563eb;
+}
+
+.progress-bar {
+  height: 12rpx;
+  background: #e5e7eb;
+  border-radius: 999rpx;
+  margin: 16rpx 0;
+  overflow: hidden;
+}
+
+.progress-inner {
+  height: 100%;
+  background: linear-gradient(90deg, #2563eb, #22d3ee);
+}
+
+.progress-desc {
+  color: #9ca3af;
+  font-size: 24rpx;
+}
+
+.location-card .label {
+  font-size: 28rpx;
+  font-weight: 600;
+}
+
+.location-card .status {
+  margin-top: 12rpx;
+  font-size: 26rpx;
+}
+
+.location-card .status.success {
+  color: #16a34a;
+}
+
+.location-card .status.warning {
+  color: #b45309;
+}
+
+.location-card .status.error {
+  color: #dc2626;
+}
+
+.location-card .distance {
+  margin-top: 8rpx;
+  color: #6b7280;
+}
+
+.location-card .retry {
+  margin-top: 16rpx;
+}
+
+.requirement-card .row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12rpx;
+  gap: 16rpx;
+}
+
+.requirement-card .row:last-child {
+  margin-bottom: 0;
+}
+
+.dot {
+  width: 16rpx;
+  height: 16rpx;
+  border-radius: 50%;
+}
+
+.dot.done {
+  background: #22c55e;
+}
+
+.dot.todo {
+  background: #fbbf24;
+}
+
+.dot.skip {
+  background: #9ca3af;
+}
+
+.requirement-card .desc {
+  margin-left: auto;
+  color: #9ca3af;
+  font-size: 24rpx;
+}
+
+.steps {
+  margin-top: 20rpx;
+}
+
+.steps .step {
+  display: flex;
+  align-items: center;
+  margin-bottom: 24rpx;
+}
+
+.steps .step:last-child {
+  margin-bottom: 0;
+}
+
+.marker {
+  width: 24rpx;
+  height: 24rpx;
+  border-radius: 50%;
+  margin-right: 16rpx;
+  background: #d1d5db;
+}
+
+.marker.done {
+  background: #34d399;
+}
+
+.marker.pending {
+  background: #fbbf24;
+}
+
+.marker.skipped {
+  background: #9ca3af;
+}
+
+.step-title {
+  font-size: 28rpx;
+  font-weight: 500;
+}
+
+.step-status {
+  color: #6b7280;
+  font-size: 24rpx;
+}
+
+.result {
+  margin-top: 24rpx;
+  font-size: 26rpx;
+  font-weight: 600;
+  text-align: center;
+}
+
+.result.success {
+  color: #16a34a;
+}
+
+.result.error {
+  color: #dc2626;
+}
+
+.actions {
+  margin-top: 20rpx;
+}
+
+.actions button {
+  margin-bottom: 16rpx;
+}
+
+.actions button:last-child {
+  margin-bottom: 0;
+}
+
+.btn-secondary {
+  background: rgba(44, 124, 241, 0.1);
+  color: #2c7cf1;
+}

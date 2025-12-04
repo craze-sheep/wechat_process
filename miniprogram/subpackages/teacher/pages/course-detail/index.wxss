@@ -1,0 +1,83 @@
+.page {
+  padding: 24rpx;
+}
+
+.info-card .title {
+  font-size: 34rpx;
+  font-weight: 600;
+}
+
+.info-card .meta {
+  margin-top: 6rpx;
+  color: #6b7280;
+}
+
+.filter-card .picker {
+  padding: 18rpx;
+  background: #f3f4f6;
+  border-radius: 12rpx;
+}
+
+.chart-card {
+  margin-top: 20rpx;
+}
+
+.section-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  margin-bottom: 12rpx;
+}
+
+.toolbar {
+  margin: 20rpx 0;
+  text-align: center;
+}
+
+.btn {
+  width: 100%;
+}
+
+.anomaly-card {
+  margin-bottom: 20rpx;
+}
+
+.anomaly-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10rpx 0;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.anomaly-row:last-child {
+  border-bottom: none;
+}
+
+.anomaly-row .tag {
+  color: #b45309;
+  font-size: 24rpx;
+}
+
+.record {
+  padding: 12rpx 0;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.record:last-child {
+  border-bottom: none;
+}
+
+.record .name {
+  font-size: 28rpx;
+}
+
+.record .detail {
+  font-size: 24rpx;
+  color: #6b7280;
+}
+
+.empty {
+  text-align: center;
+  color: #9ca3af;
+  padding: 40rpx 0;
+}

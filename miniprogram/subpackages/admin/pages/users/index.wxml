@@ -1,0 +1,14 @@
+<view class="page">
+  <view class="card search">
+    <input placeholder="按姓名/角色过滤" value="{{filter}}" bindinput="handleInput" />
+  </view>
+
+  <view class="card user" wx:for="{{displayList}}" wx:key="id">
+    <view class="row">
+      <view class="name">{{item.name}}</view>
+      <view class="role">{{item.role}}</view>
+    </view>
+    <view class="meta">{{item.dept}}</view>
+    <view class="status {{item.status}}">{{item.status === 'active' ? '启用' : '停用'}}</view>
+  </view>
+</view>

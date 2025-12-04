@@ -1,0 +1,74 @@
+<view class="page">
+  <view class="card grid">
+    <view class="cell">
+      <view class="label">学生总数</view>
+      <view class="value">{{overview.userTotal}}</view>
+    </view>
+    <view class="cell">
+      <view class="label">教师</view>
+      <view class="value">{{overview.teacherTotal}}</view>
+    </view>
+    <view class="cell">
+      <view class="label">辅导员</view>
+      <view class="value">{{overview.counselorTotal}}</view>
+    </view>
+    <view class="cell">
+      <view class="label">待审批</view>
+      <view class="value warn">{{overview.pendingApprovals}}</view>
+    </view>
+  </view>
+
+  <view class="card section">
+    <view class="title">服务健康</view>
+    <view class="service-row" wx:for="{{serviceStatus}}" wx:key="name">
+      <view class="service-name">{{item.name}}</view>
+      <view class="service-badge {{item.status}}">
+        {{item.status === 'normal' ? '正常' : item.status === 'warning' ? '告警' : '异常'}}
+      </view>
+    </view>
+  </view>
+
+  <view class="card section">
+    <view class="title">系统状态</view>
+    <view class="item">最近部署：{{overview.lastDeploy}}</view>
+  </view>
+
+  <view class="card section">
+    <view class="title">批量操作</view>
+    <view class="item">支持 Excel 导入或同步示例数据。</view>
+    <button class="btn" type="primary" size="mini" loading="{{bulkLoading}}" bindtap="handleBulkSync">同步示例用户</button>
+    <button class="btn" type="default" size="mini" loading="{{importing}}" bindtap="handleImportCourses">导入 Excel</button>
+  </view>
+
+  <view class="card section">
+    <view class="title">通知推送</view>
+    <input class="input" placeholder="通知标题" value="{{notifyTitle}}" data-field="notifyTitle" bindinput="handleNotifyInput" />
+    <textarea
+      class="textarea"
+      placeholder="通知内容"
+      value="{{notifyContent}}"
+      data-field="notifyContent"
+      bindinput="handleNotifyInput"
+    ></textarea>
+    <button class="btn" type="primary" loading="{{notifyLoading}}" bindtap="handleSendNotification">发送通知</button>
+  </view>
+
+  <view class="card section">
+    <view class="title">通知列表</view>
+    <button class="btn" size="mini" type="default" loading="{{exporting}}" bindtap="handleExportMessages">导出 Excel</button>
+    <view class="log" wx:for="{{messages}}" wx:key="id">
+      <view class="content">{{item.title}}</view>
+      <view class="meta">{{item.content}}</view>
+      <view class="meta">时间：{{item.time}}</view>
+    </view>
+    <view class="item" wx:if="{{!messages.length}}">暂无通知记录</view>
+  </view>
+
+  <view class="card section">
+    <view class="title">操作日志</view>
+    <view class="log" wx:for="{{logs}}" wx:key="id">
+      <view class="content">{{item.action}}</view>
+      <view class="meta">{{item.operator}} · {{item.time}}</view>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,46 @@
+<view class="page">
+  <view class="card info-card" wx:if="{{detail}}">
+    <view class="title">{{detail.name || courseName}}</view>
+    <view class="meta">班级：{{detail.clazz || '未关联'}} · 任课教师：{{detail.teacherId || '未设置'}}</view>
+    <view class="meta">默认模式：{{detail.defaultMode || '标准模式'}}</view>
+  </view>
+
+  <view class="card filter-card">
+    <view class="section-title">统计范围</view>
+    <picker range="{{rangeOptions}}" value="{{rangeIndex}}" bindchange="handleRangeChange">
+      <view class="picker">{{rangeOptions[rangeIndex]}}</view>
+    </picker>
+  </view>
+
+  <view class="card chart-card">
+    <view class="section-title">出勤趋势</view>
+    <ec-canvas id="historyChart" canvas-id="historyChart" ec="{{chartConfig}}"></ec-canvas>
+  </view>
+
+  <view class="card chart-card">
+    <view class="section-title">出勤占比</view>
+    <ec-canvas id="pieChart" canvas-id="pieChart" ec="{{pieConfig}}"></ec-canvas>
+  </view>
+
+  <view class="card toolbar">
+    <button type="primary" class="btn" bindtap="handleExport" loading="{{exporting}}">导出 Excel</button>
+  </view>
+
+  <view class="card anomaly-card">
+    <view class="section-title">异常提醒</view>
+    <view class="anomaly-row" wx:for="{{anomalies}}" wx:key="name">
+      <view class="name">{{item.name}}</view>
+      <view class="tag">{{item.desc}}</view>
+    </view>
+    <view class="empty" wx:if="{{!anomalies.length}}">暂无异常学生</view>
+  </view>
+
+  <view class="card">
+    <view class="section-title">最近签到记录</view>
+    <view class="record" wx:for="{{records}}" wx:key="id">
+      <view class="name">{{item.student}}</view>
+      <view class="detail">{{item.time}} · {{item.status === 'normal' ? '正常' : item.status === 'late' ? '迟到' : '缺勤'}}</view>
+    </view>
+    <view class="empty" wx:if="{{!records.length}}">暂无签到记录</view>
+  </view>
+</view>

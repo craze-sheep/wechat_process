@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "签到",
+  "usingComponents": {
+    "section-header": "/components/section-header/index"
+  }
+}

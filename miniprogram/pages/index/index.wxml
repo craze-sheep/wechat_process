@@ -1,0 +1,28 @@
+<view class="page">
+  <view class="hero card">
+    <view class="hero-title">智能考勤小程序</view>
+    <view class="hero-desc">选择角色以继续体验相应模块</view>
+    <view class="login-row">
+      <view class="login-text">{{profile ? '欢迎，' + profile.name : '请先登录云端账号'}}</view>
+      <button size="mini" bindtap="handleLogin" loading="{{loggingIn}}">
+        {{loggingIn ? '登录中' : (profile ? '重新登录' : '云端登录')}}
+      </button>
+    </view>
+  </view>
+
+  <view class="role-list">
+    <block wx:for="{{roles}}" wx:key="key">
+      <view class="role-card card" data-role="{{item.key}}" bindtap="handleRoleTap">
+        <view class="role-header">
+          <view class="role-title">{{item.title}}</view>
+          <view class="role-badge {{item.status === 'ready' ? 'badge-ready' : 'badge-todo'}}">{{item.badge}}</view>
+        </view>
+        <view class="role-desc">{{item.subtitle}}</view>
+        <view class="role-footer">
+          <view class="status-dot {{item.status}}"></view>
+          <view class="status-text">{{item.status === 'ready' ? '可体验' : '开发中'}}</view>
+        </view>
+      </view>
+    </block>
+  </view>
+</view>
