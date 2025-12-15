@@ -15,7 +15,15 @@
       <view class="header">
         <view class="student">{{item.student}}</view>
         <view class="status {{item.status}}">
-          {{item.status === 'pending' ? '待审批' : item.status === 'approved' ? '已通过' : '已驳回'}}
+          {{
+            item.status === 'counselor_approved'
+              ? '待教师审批'
+              : item.status === 'teacher_approved'
+              ? '老师已通过'
+              : item.status === 'teacher_rejected'
+              ? '老师已驳回'
+              : '待审批'
+          }}
         </view>
       </view>
       <view class="course">{{item.course}}</view>
@@ -23,7 +31,7 @@
       <view class="time">提交时间：{{item.submittedAt}}</view>
       <view class="actions">
         <button size="mini" data-id="{{item.id}}" bindtap="handleViewDetail">查看详情</button>
-        <view wx:if="{{item.status === 'pending'}}">
+        <view wx:if="{{item.status === 'counselor_approved'}}">
           <button size="mini" type="primary" data-id="{{item.id}}" bindtap="handleApprove">通过</button>
           <button size="mini" type="warn" data-id="{{item.id}}" bindtap="handleReject">驳回</button>
         </view>

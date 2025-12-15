@@ -77,6 +77,11 @@ Page({
     const field = event.currentTarget.dataset.field;
     this.setData({ [field]: event.detail.value });
   },
+  handleOpenMessages() {
+    wx.navigateTo({
+      url: "/pages/messages/index"
+    });
+  },
   handleSendNotification() {
     if (this.data.notifyLoading) return;
     if (!this.data.notifyTitle || !this.data.notifyContent) {

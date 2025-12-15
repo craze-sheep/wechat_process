@@ -23,6 +23,8 @@ const seeds = {
   users: [
     {
       _id: "stu_001",
+      username: "student1",
+      password: "123456",
       role: "student",
       name: "李明",
       major: "计算机科学与技术",
@@ -35,12 +37,81 @@ const seeds = {
     },
     {
       _id: "tch_001",
+      username: "teacher1",
+      password: "123456",
       role: "teacher",
       name: "王老师",
       department: "计算机学院",
       status: "active",
       openid: "demo-teacher-openid",
       token: "token-teacher",
+      createdAt: Date.now(),
+      updatedAt: Date.now()
+    },
+    {
+      _id: "stu_002",
+      username: "student2",
+      password: "123456",
+      role: "student",
+      name: "张晓",
+      major: "软件工程",
+      status: "active",
+      faceStatus: "pending",
+      openid: "demo-student2-openid",
+      token: "token-student2",
+      createdAt: Date.now(),
+      updatedAt: Date.now()
+    },
+    {
+      _id: "stu_003",
+      username: "student3",
+      password: "123456",
+      role: "student",
+      name: "陈阳",
+      major: "人工智能",
+      status: "active",
+      faceStatus: "pending",
+      openid: "demo-student3-openid",
+      token: "token-student3",
+      createdAt: Date.now(),
+      updatedAt: Date.now()
+    },
+    {
+      _id: "tch_002",
+      username: "teacher2",
+      password: "123456",
+      role: "teacher",
+      name: "刘老师",
+      department: "数学学院",
+      status: "active",
+      openid: "demo-teacher2-openid",
+      token: "token-teacher2",
+      createdAt: Date.now(),
+      updatedAt: Date.now()
+    },
+    {
+      _id: "csl_001",
+      username: "counselor1",
+      password: "123456",
+      role: "counselor",
+      name: "李辅导",
+      department: "学工部",
+      status: "active",
+      openid: "demo-counselor-openid",
+      token: "token-counselor",
+      createdAt: Date.now(),
+      updatedAt: Date.now()
+    },
+    {
+      _id: "adm_001",
+      username: "admin1",
+      password: "123456",
+      role: "admin",
+      name: "系统管理员",
+      department: "信息中心",
+      status: "active",
+      openid: "demo-admin-openid",
+      token: "token-admin",
       createdAt: Date.now(),
       updatedAt: Date.now()
     }
@@ -68,6 +139,26 @@ const seeds = {
       defaultMode: "高安全模式",
       createdAt: Date.now(),
       updatedAt: Date.now()
+    },
+    {
+      _id: "course_003",
+      name: "人工智能导论",
+      teacherId: "tch_002",
+      clazz: "人工智能 2101",
+      schedule: [{ weekday: 2, time: "14:00-15:40", location: "综合楼 402" }],
+      defaultMode: "标准模式",
+      createdAt: Date.now(),
+      updatedAt: Date.now()
+    },
+    {
+      _id: "course_004",
+      name: "概率论与数理统计",
+      teacherId: "tch_002",
+      clazz: "软件 2002",
+      schedule: [{ weekday: 4, time: "10:00-11:40", location: "教学楼 B201" }],
+      defaultMode: "便捷模式",
+      createdAt: Date.now(),
+      updatedAt: Date.now()
     }
   ],
   enrollments: [
@@ -81,9 +172,33 @@ const seeds = {
     },
     {
       _id: "enroll_002",
+      courseId: "course_001",
+      studentId: "stu_002",
+      status: "enrolled",
+      createdAt: Date.now(),
+      updatedAt: Date.now()
+    },
+    {
+      _id: "enroll_003",
       courseId: "course_002",
       studentId: "stu_001",
-      status: "auditing",
+      status: "enrolled",
+      createdAt: Date.now(),
+      updatedAt: Date.now()
+    },
+    {
+      _id: "enroll_004",
+      courseId: "course_003",
+      studentId: "stu_003",
+      status: "enrolled",
+      createdAt: Date.now(),
+      updatedAt: Date.now()
+    },
+    {
+      _id: "enroll_005",
+      courseId: "course_004",
+      studentId: "stu_002",
+      status: "enrolled",
       createdAt: Date.now(),
       updatedAt: Date.now()
     }
@@ -131,6 +246,21 @@ const seeds = {
       courseName: "高等数学",
       studentName: "李明",
       signedAt: Date.now()
+    },
+    {
+      _id: "record_002",
+      recordId: "record_002",
+      batchId: "batch_001",
+      courseId: "course_001",
+      studentId: "stu_002",
+      status: "late",
+      verify: {
+        qr: true,
+        face: false
+      },
+      courseName: "高等数学",
+      studentName: "张晓",
+      signedAt: Date.now() - 5 * 60 * 1000
     }
   ],
   makeup_requests: [
@@ -164,6 +294,20 @@ const seeds = {
       followups: [
         { time: Date.now() - 2 * 24 * 60 * 60 * 1000, content: "电话提醒家长，安排沟通", owner: "辅导员" }
       ],
+      createdAt: Date.now(),
+      updatedAt: Date.now()
+    },
+    {
+      _id: "alert_002",
+      alertId: "alert_002",
+      studentId: "stu_002",
+      studentName: "张晓",
+      clazz: "软件 2002",
+      level: "serious",
+      reason: "两周缺勤 3 次",
+      lastAbsence: "概率论 12-01",
+      status: "open",
+      followups: [],
       createdAt: Date.now(),
       updatedAt: Date.now()
     }
@@ -209,16 +353,22 @@ async function ensureCollection(name) {
 async function upsertDocuments(name, docs = []) {
   const collection = db.collection(name);
   for (const doc of docs) {
+    const { _id, ...rest } = doc;
+    const docId = _id || doc.id || doc.docId;
+    if (!docId) {
+      continue;
+    }
     await collection
-      .doc(doc._id)
+      .doc(docId)
       .set({
         data: {
-          ...doc,
-          updatedAt: Date.now()
+          ...rest,
+          updatedAt: Date.now(),
+          createdAt: rest.createdAt || Date.now()
         }
       })
       .catch((err) => {
-        throw new Error(`写入 ${name}/${doc._id} 失败: ${err.message || err.errMsg}`);
+        throw new Error(`写入 ${name}/${docId} 失败: ${err.message || err.errMsg}`);
       });
   }
 }

@@ -1,55 +1,144 @@
 .page {
-  padding: 24rpx;
+  padding: 16rpx;
+  background: #f5f7fb;
 }
 
-.filter {
+.card {
+  background: #fff;
+  border-radius: 14rpx;
+  padding: 16rpx;
+  box-shadow: 0 8rpx 20rpx rgba(0, 0, 0, 0.04);
+  margin-bottom: 16rpx;
+}
+
+.hero {
+  background: linear-gradient(135deg, #0ea5e9, #6366f1);
+  color: #fff;
+}
+
+.hero-row {
   display: flex;
   align-items: center;
-  gap: 16rpx;
-  margin-bottom: 20rpx;
+  justify-content: space-between;
+  gap: 12rpx;
 }
 
-.filter .picker {
-  background: #f3f4f6;
-  padding: 16rpx;
-  border-radius: 14rpx;
+.avatar {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 20rpx;
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32rpx;
+  font-weight: 700;
+}
+
+.hero-text .hero-title {
+  font-size: 34rpx;
+  font-weight: 700;
+}
+
+.hero-text .hero-sub {
   font-size: 24rpx;
+  opacity: 0.85;
+  margin-top: 4rpx;
 }
 
-.filter input {
-  flex: 1;
-  padding: 18rpx;
-  border-radius: 14rpx;
-  background: #f3f4f6;
+.hero-text .hero-tip {
+  font-size: 22rpx;
+  opacity: 0.8;
+  margin-top: 6rpx;
+}
+
+.profile-btn {
+  background: #fff;
+  color: #0ea5e9;
+  border: none;
+}
+
+.filter-row {
+  margin-top: 16rpx;
+  display: grid;
+  grid-template-columns: 1fr 1.4fr;
+  gap: 10rpx;
+}
+
+.picker,
+.search {
+  padding: 14rpx 16rpx;
+  background: rgba(255, 255, 255, 0.16);
+  border-radius: 10rpx;
+  color: #fff;
+}
+
+.search {
+  background: rgba(255, 255, 255, 0.12);
 }
 
 .stats-card {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 12rpx;
-  margin-bottom: 24rpx;
 }
 
 .stat {
-  background: #f8fafc;
-  border-radius: 16rpx;
-  padding: 16rpx;
-  text-align: center;
+  background: #f9fafb;
+  border-radius: 10rpx;
+  padding: 12rpx;
 }
 
 .stat .label {
-  color: #9ca3af;
-  font-size: 22rpx;
+  color: #6b7280;
+  font-size: 24rpx;
 }
 
 .stat .value {
-  font-size: 32rpx;
+  font-size: 34rpx;
   font-weight: 600;
-  margin-top: 8rpx;
+  margin-top: 6rpx;
+}
+
+.action-card {
+  padding: 18rpx 16rpx;
+}
+
+.action-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  margin-bottom: 12rpx;
+}
+
+.action-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12rpx;
+}
+
+.action-btn {
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  color: #fff;
+  border: none;
+  border-radius: 12rpx;
+  padding: 18rpx 0;
+  font-size: 28rpx;
+  font-weight: 600;
+}
+
+.action-btn.ghost {
+  background: #f3f4f6;
+  color: #0f172a;
+}
+
+.action-btn.info {
+  background: #eef2ff;
+  color: #4338ca;
 }
 
 .course {
-  margin-bottom: 20rpx;
+  padding: 18rpx;
 }
 
 .header {

@@ -1,10 +1,12 @@
 const cloud = require("wx-server-sdk");
+const crypto = require("crypto");
 
 cloud.init({
   env: cloud.DYNAMIC_CURRENT_ENV
 });
 
 const db = cloud.database();
+const _ = db.command;
 
 const success = (data = null) => ({
   code: 0,
@@ -33,16 +35,32 @@ const mockUsers = {
 
 const usersCollection = db.collection("users");
 
+const TOKEN_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
+
+const generateToken = () => {
+  const random = crypto.randomBytes(16).toString("hex");
+  const token = `tk_${random}`;
+  const expireAt = Date.now() + TOKEN_TTL_MS;
+  return { token, expireAt };
+};
+
+const isTokenValid = (doc = {}) => {
+  if (!doc.token || !doc.tokenExpire) return false;
+  return doc.tokenExpire > Date.now();
+};
+
 const pickProfile = (doc) => {
   if (!doc) return null;
   return {
     _id: doc._id,
+    username: doc.username,
     role: doc.role,
     name: doc.name,
     major: doc.major,
     department: doc.department,
     status: doc.status,
-    token: doc.token || `token-${doc.role || "student"}`
+    token: doc.token || `token-${doc.role || "student"}`,
+    tokenExpire: doc.tokenExpire
   };
 };
 
@@ -52,16 +70,37 @@ const getUserByOpenid = async (openid) => {
   return res.data[0] || null;
 };
 
+const getUserByAccount = async (account) => {
+  if (!account) return null;
+  const res = await usersCollection
+    .where(
+      _.or([
+        { username: account },
+        { _id: account },
+        { openid: account },
+        { phone: account }
+      ])
+    )
+    .limit(1)
+    .get();
+  return res.data[0] || null;
+};
+
 const upsertUser = async (openid, payload = {}) => {
   const existed = await getUserByOpenid(openid);
   const now = Date.now();
   const docId = existed?._id || payload._id || `user_${now}`;
+  const nextToken =
+    payload.token || (isTokenValid(existed) ? existed.token : null) || generateToken().token;
+  const nextExpire =
+    payload.tokenExpire || (isTokenValid(existed) ? existed.tokenExpire : null) || Date.now() + TOKEN_TTL_MS;
   const record = {
     ...existed,
     ...payload,
     _id: docId,
     openid,
-    token: payload.token || existed?.token || `token-${payload.role || existed?.role || "student"}`,
+    token: nextToken,
+    tokenExpire: nextExpire,
     role: payload.role || existed?.role || "student",
     status: payload.status || existed?.status || "active",
     createdAt: existed?.createdAt || now,
@@ -95,21 +134,66 @@ exports.main = async (event) => {
     switch (action) {
       case "login": {
         const user = await ensureUser(targetOpenid);
-        return success(pickProfile(user));
+        const tokenData = generateToken();
+        await usersCollection.doc(user._id).update({
+          data: {
+            token: tokenData.token,
+            tokenExpire: tokenData.expireAt,
+            updatedAt: Date.now()
+          }
+        });
+        return success(
+          pickProfile({
+            ...user,
+            token: tokenData.token,
+            tokenExpire: tokenData.expireAt
+          })
+        );
       }
       case "switchRole": {
         const { role } = event;
         if (!role) {
           return failure("role 必填", 400);
         }
+        const tokenData = generateToken();
         const user = await upsertUser(targetOpenid, {
           role,
-          token: `token-${role}`
+          token: tokenData.token,
+          tokenExpire: tokenData.expireAt
         });
         return success({
           role: user.role,
-          token: user.token
+          token: user.token,
+          tokenExpire: user.tokenExpire
         });
+      }
+      case "loginWithPassword": {
+        const { username, password } = event;
+        if (!username || !password) {
+          return failure("username/password 必填", 400);
+        }
+        const user = await getUserByAccount(username);
+        if (!user) {
+          return failure("账号不存在", 404);
+        }
+        if (!user.password || user.password !== password) {
+          return failure("账号或密码错误", 401);
+        }
+        const tokenData = generateToken();
+        await usersCollection.doc(user._id).update({
+          data: {
+            token: tokenData.token,
+            tokenExpire: tokenData.expireAt,
+            updatedAt: Date.now()
+          }
+        });
+        return success(
+          pickProfile({
+            ...user,
+            token: tokenData.token,
+            tokenExpire: tokenData.expireAt
+          })
+        );
       }
       default:
         return failure(`未知 action: ${action}`, 400);

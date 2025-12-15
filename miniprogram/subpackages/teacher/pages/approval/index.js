@@ -1,21 +1,3 @@
-const defaultApprovalList = [
-  {
-    id: "mk-002",
-    student: "李明",
-    course: "数据结构",
-    reason: "发烧请假",
-    submittedAt: "11-11 21:30",
-    status: "pending"
-  },
-  {
-    id: "mk-003",
-    student: "王强",
-    course: "高等数学",
-    reason: "比赛外出",
-    submittedAt: "11-10 08:12",
-    status: "pending"
-  }
-];
 const makeupService = require("../../../../common/services/makeup");
 
 const formatDateTime = (timestamp) => {
@@ -26,8 +8,8 @@ const formatDateTime = (timestamp) => {
 
 Page({
   data: {
-    approvals: defaultApprovalList,
-    displayApprovals: defaultApprovalList,
+    approvals: [],
+    displayApprovals: [],
     loading: false,
     statusOptions: ["全部", "待审批", "已通过", "已驳回"],
     statusIndex: 0,
@@ -41,11 +23,11 @@ Page({
   },
   handleApprove(event) {
     const id = event.currentTarget.dataset.id;
-    this.updateStatus(id, "approved");
+    this.updateStatus(id, "teacher_approved");
   },
   handleReject(event) {
     const id = event.currentTarget.dataset.id;
-    this.updateStatus(id, "rejected");
+    this.updateStatus(id, "teacher_rejected");
   },
   updateStatus(id, status) {
     wx.showLoading({ title: "提交中...", mask: true });
@@ -72,17 +54,19 @@ Page({
       .then((list = []) => {
         const normalized =
           list.length > 0
-            ? list.map((item) => ({
-                id: item.requestId || item._id,
-                student: item.studentName,
-                course: item.courseName,
-                reason: item.reason,
-                submittedAt: formatDateTime(item.createdAt),
-                status: item.status || "pending",
-                evidence: item.evidence || "",
-                type: item.type || "病假"
-              }))
-            : defaultApprovalList;
+            ? list
+                .filter((item) => (item.status || "counselor_pending") === "counselor_approved")
+                .map((item) => ({
+                  id: item.requestId || item._id,
+                  student: item.studentName,
+                  course: item.courseName,
+                  reason: item.reason,
+                  submittedAt: formatDateTime(item.createdAt),
+                  status: item.status || "counselor_pending",
+                  evidence: item.evidence || "",
+                  type: item.type || "病假"
+                }))
+            : [];
         const courseOptions = ["全部课程", ...Array.from(new Set(normalized.map((item) => item.course)))];
         this.setData(
           {
@@ -93,7 +77,7 @@ Page({
         );
       })
       .catch(() => {
-        this.setData({ approvals: defaultApprovalList, displayApprovals: defaultApprovalList });
+        this.setData({ approvals: [], displayApprovals: [] });
       })
       .finally(() => this.setData({ loading: false }));
   },
@@ -104,7 +88,7 @@ Page({
     this.setData({ courseIndex: Number(event.detail.value) || 0 }, () => this.applyFilters());
   },
   applyFilters() {
-    const statusMap = ["all", "pending", "approved", "rejected"];
+    const statusMap = ["all", "counselor_approved", "teacher_approved", "teacher_rejected"];
     const targetStatus = statusMap[this.data.statusIndex];
     let list = this.data.approvals.slice();
     if (targetStatus !== "all") {

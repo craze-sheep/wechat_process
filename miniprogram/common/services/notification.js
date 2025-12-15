@@ -9,25 +9,25 @@ const normalize = (res) => {
   return hasCode ? result.data : result;
 };
 
-const login = () =>
-  callFunction("auth", {
-    action: "login"
-  }).then(normalize);
-
-const loginWithPassword = (payload) =>
-  callFunction("auth", {
-    action: "loginWithPassword",
+const list = (payload = {}) =>
+  callFunction("notification", {
+    action: "list",
     ...payload
   }).then(normalize);
 
-const switchRole = (role) =>
-  callFunction("auth", {
-    action: "switchRole",
-    role
+const markRead = ({ messageId }) =>
+  callFunction("notification", {
+    action: "markRead",
+    messageId
+  }).then(normalize);
+
+const unreadCount = () =>
+  callFunction("notification", {
+    action: "unreadCount"
   }).then(normalize);
 
 module.exports = {
-  login,
-  loginWithPassword,
-  switchRole
+  list,
+  markRead,
+  unreadCount
 };

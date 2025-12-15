@@ -50,6 +50,16 @@ Page({
       url: "/subpackages/counselor/pages/alerts/index"
     });
   },
+  handleMessages() {
+    wx.navigateTo({
+      url: "/pages/messages/index"
+    });
+  },
+  handleLeaveApproval() {
+    wx.navigateTo({
+      url: "/subpackages/counselor/pages/makeup-review/index"
+    });
+  },
   handleFilterChange(event) {
     const field = event.currentTarget.dataset.field;
     const value = Number(event.detail.value) || 0;

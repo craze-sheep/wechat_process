@@ -23,6 +23,20 @@ const handleError = (err, fallbackMessage) => {
   return failure(message, code);
 };
 
+const extractToken = (event) => event?.token || event?.data?.token;
+
+const ensureAuth = async (event, allowedRoles = []) => {
+  const token = extractToken(event);
+  if (!token) throw { message: "未登录", code: 401 };
+  const { OPENID } = cloud.getWXContext();
+  const res = await usersCollection.where({ openid: OPENID, token }).limit(1).get();
+  const user = res.data?.[0];
+  if (!user) throw { message: "token 无效", code: 401 };
+  if (user.tokenExpire && user.tokenExpire <= Date.now()) throw { message: "登录已过期", code: 401 };
+  if (allowedRoles.length && !allowedRoles.includes(user.role)) throw { message: "无权限", code: 403 };
+  return user;
+};
+
 const usersCollection = db.collection("users");
 const coursesCollection = db.collection("courses");
 const batchesCollection = db.collection("sign_batches");
@@ -79,6 +93,7 @@ exports.main = async (event) => {
     return failure("action 不能为空", 400);
   }
   try {
+    await ensureAuth(event, ["admin"]);
     switch (action) {
       case "overview": {
         const [userTotal, teacherTotal, counselorTotal, pendingApprovals, latestBatchRes, logsRes] = await Promise.all([

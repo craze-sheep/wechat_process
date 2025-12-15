@@ -27,7 +27,10 @@ Page({
     makeupService
       .listPendingRequests()
       .then((list = []) => {
-        const filtered = list.filter((item) => (item.type || "").includes("公假") || (item.type || "").includes("其他"));
+        const filtered = list.map((item) => ({
+          ...item,
+          status: item.status || "counselor_pending"
+        }));
         const normalized = filtered.map(normalize);
         this.setData({ list: normalized, displayList: normalized });
       })
@@ -42,17 +45,17 @@ Page({
   applyFilters() {
     let list = this.data.list.slice();
     if (this.data.statusIndex === 0) {
-      list = list.filter((item) => item.status === "pending");
+      list = list.filter((item) => item.status === "counselor_pending" || item.status === "pending");
     }
     this.setData({ displayList: list });
   },
   handleApprove(event) {
     const id = event.currentTarget.dataset.id;
-    this.updateStatus(id, "approved");
+    this.updateStatus(id, "counselor_approved");
   },
   handleReject(event) {
     const id = event.currentTarget.dataset.id;
-    this.updateStatus(id, "rejected");
+    this.updateStatus(id, "counselor_rejected");
   },
   updateStatus(id, status) {
     makeupService

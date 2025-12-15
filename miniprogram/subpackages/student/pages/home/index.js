@@ -63,10 +63,9 @@ Page({
     historyLoading: false,
     refreshing: false,
     quickActions: [
-      { id: "scan", label: "扫码签到", icon: "📷", path: "/subpackages/student/pages/sign/index" },
-      { id: "makeup", label: "补签申请", icon: "📝", path: "/subpackages/student/pages/makeup/index" },
-      { id: "records", label: "考勤记录", icon: "📊", path: "/subpackages/student/pages/history/index" },
-      { id: "messages", label: "消息通知", icon: "🔔", path: "" }
+      { id: "scan", label: "签到", icon: "📷", path: "/subpackages/student/pages/sign/index" },
+      { id: "leave", label: "请假/补签", icon: "📝", path: "/subpackages/student/pages/makeup/index" },
+      { id: "messages", label: "消息", icon: "🔔", path: "/pages/messages/index" }
     ],
     weeklySummary: {
       normal: 0,
@@ -89,6 +88,11 @@ Page({
     const id = event.currentTarget.dataset.id;
     wx.navigateTo({
       url: `/subpackages/student/pages/sign/index?courseId=${id}`
+    });
+  },
+  handleProfile() {
+    wx.navigateTo({
+      url: "/pages/profile/index"
     });
   },
   handleCourseLongPress(event) {
@@ -151,6 +155,7 @@ Page({
     this.setData({ refreshing: true });
     if (!db) {
       this.useMock();
+      this.setData({ refreshing: false });
       return;
     }
     db.collection("courses")
@@ -174,11 +179,15 @@ Page({
             };
           }) || [];
         this.setData({
-          courses: courses.length ? courses : defaultDashboard.courses
+          courses
         });
+        if (!courses.length) {
+          wx.showToast({ title: "课程数据为空", icon: "none" });
+        }
       })
       .catch(() => {
-        this.useMock();
+        this.setData({ courses: [] });
+        wx.showToast({ title: "课程加载失败", icon: "none" });
       })
       .finally(() => {
         this.setData({ refreshing: false });
@@ -226,10 +235,16 @@ Page({
         });
       })
       .catch(() => {
+        const fallbackStats = {
+          weekAttendance: defaultDashboard.stats.weekAttendance,
+          lateCount: defaultDashboard.stats.lateCount,
+          absentCount: defaultDashboard.stats.absentCount,
+          trend: defaultDashboard.stats.trend
+        };
         this.setData({
-          stats: defaultDashboard.stats,
+          stats: fallbackStats,
           weeklySummary: {
-            normal: defaultDashboard.stats.normal || 0,
+            normal: 0,
             late: defaultDashboard.stats.lateCount,
             absent: defaultDashboard.stats.absentCount
           }
@@ -257,11 +272,15 @@ Page({
           type: "info"
         }));
         this.setData({
-          reminders: list.length ? list : defaultDashboard.reminders
+          reminders: list
         });
+        if (!list.length) {
+          wx.showToast({ title: "暂无提醒", icon: "none" });
+        }
       })
       .catch(() => {
-        this.setData({ reminders: defaultDashboard.reminders });
+        this.setData({ reminders: [] });
+        wx.showToast({ title: "提醒加载失败", icon: "none" });
       });
   },
   computeStatus(schedule = {}) {

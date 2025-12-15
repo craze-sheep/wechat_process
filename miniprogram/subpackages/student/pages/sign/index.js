@@ -18,7 +18,7 @@ const defaultSignTask = {
     { id: "scan", label: "扫码签到", icon: "📷", path: "/subpackages/student/pages/sign/index" },
     { id: "makeup", label: "补签申请", icon: "📝", path: "/subpackages/student/pages/makeup/index" },
     { id: "records", label: "考勤记录", icon: "📊", path: "/subpackages/student/pages/history/index" },
-    { id: "messages", label: "消息通知", icon: "🔔", path: "" }
+    { id: "messages", label: "消息通知", icon: "🔔", path: "/pages/messages/index" }
   ]
 };
 const attendanceService = require("../../../../common/services/attendance");
@@ -83,7 +83,7 @@ Page({
   currentBatch: null,
   currentLocationPoint: null,
   locationDistanceMeters: null,
-  scanVerified: false,
+  scanVerified: null,
   faceVerified: false,
   countdownTimer: null,
   locationSettingPrompted: false,
@@ -184,7 +184,7 @@ Page({
     return `${mm}:${ss}`;
   },
   resetState() {
-    this.scanVerified = false;
+    this.scanVerified = null;
     this.faceVerified = false;
     this.currentLocationPoint = null;
     this.locationDistanceMeters = null;
@@ -338,8 +338,13 @@ Page({
           return;
         }
         wx.scanCode({
-          success: () => {
-            this.scanVerified = true;
+          success: (res) => {
+            const qrInfo = {
+              seed: this.currentBatch?.qrSeed,
+              signature: this.currentBatch?.qrSignature,
+              raw: res?.result || ""
+            };
+            this.scanVerified = qrInfo;
             wx.showToast({ title: "二维码已验证", icon: "success" });
             this.updateStepStatus(1, "done");
           },
@@ -385,6 +390,10 @@ Page({
     }
     if (!this.scanVerified) {
       wx.showToast({ title: "请完成扫码验证", icon: "none" });
+      return;
+    }
+    if (!this.scanVerified.seed || !this.scanVerified.signature) {
+      wx.showToast({ title: "二维码信息缺失，请重新扫码", icon: "none" });
       return;
     }
     if (task.faceRequired && !this.faceVerified) {

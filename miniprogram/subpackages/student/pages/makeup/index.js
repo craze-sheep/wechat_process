@@ -1,21 +1,3 @@
-const defaultMakeupRecords = [
-  {
-    id: "mk-001",
-    course: "大学英语",
-    date: "2025-11-02",
-    status: "approved",
-    reason: "参加竞赛",
-    approver: "张老师"
-  },
-  {
-    id: "mk-002",
-    course: "线性代数",
-    date: "2025-11-05",
-    status: "pending",
-    reason: "发烧请假",
-    approver: "待审核"
-  }
-];
 const makeupService = require("../../../../common/services/makeup");
 
 const formatDate = (timestamp) => {
@@ -29,7 +11,7 @@ const normalizeRecords = (records = []) =>
     id: item.requestId || item._id,
     course: item.courseName || item.courseId || "未命名课程",
     date: formatDate(item.createdAt),
-    status: item.status || "pending",
+    status: item.status || "counselor_pending",
     reason: item.reason || "--",
     approver: item.approver || "待审核"
   }));
@@ -43,7 +25,7 @@ Page({
       evidence: []
     },
     submitting: false,
-    records: defaultMakeupRecords,
+    records: [],
     types: ["病假", "事假", "公假", "其他"],
     loadingRecords: false,
     attachments: [],
@@ -118,11 +100,10 @@ Page({
     makeupService
       .listStudentRequests()
       .then((list = []) => {
-    const nextList = list.length ? normalizeRecords(list) : defaultMakeupRecords;
-        this.setData({ records: nextList });
+        this.setData({ records: normalizeRecords(list) });
       })
       .catch(() => {
-        this.setData({ records: defaultMakeupRecords });
+        this.setData({ records: [] });
       })
       .finally(() => this.setData({ loadingRecords: false }));
   },
@@ -164,11 +145,25 @@ Page({
     const id = event.currentTarget.dataset.id;
     const target = this.data.records.find((item) => item.id === id);
     if (!target) return;
+    const statusLabel = this.statusText(target.status);
     wx.showModal({
       title: target.course,
-      content: `${target.date}\n类型：${target.status}\n理由：${target.reason}\n审批人：${target.approver}`,
+      content: `${target.date}\n状态：${statusLabel}\n理由：${target.reason}\n审批人：${target.approver}`,
       showCancel: false
     });
+  },
+  statusText(status) {
+    const map = {
+      counselor_pending: "辅导员审批中",
+      counselor_approved: "辅导员已通过，等待老师",
+      counselor_rejected: "辅导员已驳回",
+      teacher_approved: "老师已通过",
+      teacher_rejected: "老师已驳回",
+      pending: "审批中",
+      approved: "已通过",
+      rejected: "已驳回"
+    };
+    return map[status] || "审批中";
   },
   resetForm() {
     this.setData({

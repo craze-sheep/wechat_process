@@ -1,4 +1,5 @@
 const cloud = require("wx-server-sdk");
+const crypto = require("crypto");
 
 cloud.init({
   env: cloud.DYNAMIC_CURRENT_ENV
@@ -8,8 +9,14 @@ const db = cloud.database();
 const _ = db.command;
 
 const EARTH_RADIUS = 6371000;
+const SIGN_SECRET = process.env.SIGN_SECRET || "sign-secret-placeholder";
 
 const toRadians = (value) => (value * Math.PI) / 180;
+
+const buildSignature = (seed) => {
+  if (!seed) return "";
+  return crypto.createHmac("sha256", SIGN_SECRET).update(seed).digest("hex");
+};
 
 const computeDistanceMeters = (lat1, lon1, lat2, lon2) => {
   if ([lat1, lon1, lat2, lon2].some((coord) => typeof coord !== "number")) {
@@ -70,6 +77,38 @@ const courseCollection = db.collection("courses");
 const userCollection = db.collection("users");
 const messageCollection = db.collection("messages");
 
+const extractToken = (event) => event?.token || event?.data?.token;
+
+const ensureAuth = async (event, allowedRoles = []) => {
+  const token = extractToken(event);
+  if (!token) {
+    throw { message: "未登录", code: 401 };
+  }
+  const { OPENID } = cloud.getWXContext();
+  const res = await userCollection.where({ openid: OPENID, token }).limit(1).get();
+  const user = res.data?.[0];
+  if (!user) {
+    throw { message: "token 无效", code: 401 };
+  }
+  if (user.tokenExpire && user.tokenExpire <= Date.now()) {
+    throw { message: "登录已过期，请重新登录", code: 401 };
+  }
+  if (allowedRoles.length && !allowedRoles.includes(user.role)) {
+    throw { message: "无权限", code: 403 };
+  }
+  return user;
+};
+
+const verifyQrSignature = (batch, qrPayload = {}) => {
+  const seed = qrPayload.seed || qrPayload.qrSeed || "";
+  const signature = qrPayload.signature || "";
+  if (!seed || !signature) return false;
+  const expected = buildSignature(seed);
+  if (signature !== expected) return false;
+  if (batch?.qrSeed && batch.qrSeed !== seed) return false;
+  return true;
+};
+
 const normalizeBatch = (doc) => {
   if (!doc) return null;
   const now = Date.now();
@@ -84,6 +123,7 @@ const normalizeBatch = (doc) => {
     endTime: doc.endTime || now,
     status: doc.status || "open",
     qrSeed: doc.qrSeed || `seed-${batchId}`,
+    qrSignature: doc.qrSignature || buildSignature(doc.qrSeed || `seed-${batchId}`),
     location: doc.location || null,
     createdBy: doc.createdBy || "",
     total: typeof doc.total === "number" ? doc.total : 0,
@@ -138,12 +178,6 @@ const fetchCourse = async (courseId) => {
   }
 };
 
-const getUserByOpenid = async (openid) => {
-  if (!openid) return null;
-  const res = await userCollection.where({ openid }).limit(1).get();
-  return res.data[0] || null;
-};
-
 const mapRecord = (record) => ({
   id: record.recordId || record._id,
   studentId: record.studentId,
@@ -162,14 +196,17 @@ exports.main = async (event) => {
   try {
     switch (action) {
       case "fetchBatch": {
+        await ensureAuth(event);
         const { batchId, courseId } = event;
         const batch = (await fetchBatchFromDB({ batchId, courseId })) || mockBatches[0] || null;
         return success(batch);
       }
       case "startSign": {
+        const user = await ensureAuth(event, ["teacher", "admin"]);
         const payload = event.payload || {};
         const now = Date.now();
         const batchId = payload.batchId || `batch-${now}`;
+        const qrSeed = payload.qrSeed || `seed-${batchId}`;
         const courseInfo = payload.courseId ? await fetchCourse(payload.courseId) : null;
         const record = {
           _id: batchId,
@@ -179,9 +216,10 @@ exports.main = async (event) => {
           mode: payload.mode || courseInfo?.defaultMode || "标准模式",
           startTime: payload.startTime || now,
           endTime: payload.endTime || now + (payload.duration || 10) * 60 * 1000,
-          qrSeed: payload.qrSeed || `seed-${batchId}`,
+          qrSeed,
+          qrSignature: buildSignature(qrSeed),
           location: payload.location || null,
-          createdBy: payload.createdBy || courseInfo?.teacherId || "",
+          createdBy: payload.createdBy || courseInfo?.teacherId || user._id || "",
           total: typeof payload.total === "number" ? payload.total : courseInfo?.expectedStudents || 0,
           signed: payload.signed || 0,
           status: payload.status || "open",
@@ -194,25 +232,42 @@ exports.main = async (event) => {
         return success(normalizeBatch(record));
       }
       case "submitRecord": {
+        const user = await ensureAuth(event, ["student", "teacher", "counselor", "admin"]);
         const payload = event.payload || {};
         if (!payload.batchId) {
           return failure("batchId 参数必填", 400);
         }
-        const { OPENID } = cloud.getWXContext();
-        const user = (await getUserByOpenid(event.openid || OPENID)) || {};
         const batchDoc = await getBatchDoc(payload.batchId);
         if (!batchDoc) {
           return failure("签到批次不存在", 404);
         }
         const batch = await ensureAutoClose(batchDoc);
+        const now = Date.now();
+        if (batch?.startTime && now < batch.startTime) {
+          return failure("签到未开始", 400);
+        }
+        if (batch?.endTime && now > batch.endTime) {
+          return failure("签到已结束", 400);
+        }
         if (batch?.status === "closed") {
           return failure("签到已结束", 400);
         }
-        if (!payload.verify?.qr) {
+        const qrInfo = payload.verify?.qr;
+        if (!qrInfo) {
           return failure("请完成二维码验证", 400);
+        }
+        if (!verifyQrSignature(batch, qrInfo)) {
+          return failure("二维码无效或已过期", 400);
         }
         if (batch?.mode === "高安全模式" && !payload.verify?.face) {
           return failure("当前策略要求完成活体识别", 400);
+        }
+        const existing = await recordCollection
+          .where({ batchId: payload.batchId, studentId: user._id })
+          .limit(1)
+          .get();
+        if (existing.data && existing.data.length) {
+          return failure("已完成签到，请勿重复提交", 400);
         }
         const locationPayload = payload.verify?.location || null;
         let distance = null;
@@ -239,7 +294,6 @@ exports.main = async (event) => {
             return failure("当前定位不在签到范围内", 400);
           }
         }
-        const now = Date.now();
         const recordId = payload.recordId || `record-${now}`;
         const sanitizedVerify = {
           ...payload.verify,
@@ -279,6 +333,7 @@ exports.main = async (event) => {
         });
       }
       case "listRecords": {
+        await ensureAuth(event);
         const { batchId, studentId, courseId } = event;
         let query = recordCollection;
         if (studentId) {
@@ -306,6 +361,7 @@ exports.main = async (event) => {
         });
       }
       case "refreshQr": {
+        await ensureAuth(event, ["teacher", "admin"]);
         const { batchId } = event;
         if (!batchId) return failure("batchId 必填", 400);
         const newSeed = `seed-${Date.now()}`;
@@ -314,12 +370,14 @@ exports.main = async (event) => {
           .update({
             data: {
               qrSeed: newSeed,
+              qrSignature: buildSignature(newSeed),
               updatedAt: Date.now()
             }
           });
-        return success({ batchId, qrSeed: newSeed });
+        return success({ batchId, qrSeed: newSeed, qrSignature: buildSignature(newSeed) });
       }
       case "closeBatch": {
+        await ensureAuth(event, ["teacher", "admin"]);
         const { batchId } = event;
         if (!batchId) return failure("batchId 必填", 400);
         await batchCollection
@@ -333,6 +391,7 @@ exports.main = async (event) => {
         return success({ batchId });
       }
       case "sendReminder": {
+        await ensureAuth(event, ["teacher", "admin"]);
         const { batchId, message } = event;
         if (!batchId) {
           return failure("batchId 必填", 400);

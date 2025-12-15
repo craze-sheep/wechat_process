@@ -23,16 +23,37 @@ Page({
     courses: defaultTeacherCourses,
     displayCourses: defaultTeacherCourses,
     keyword: "",
-    termOptions: ["2025秋季学期", "2025春季学期", "2024秋季学期"],
-    termIndex: 0,
-    stats: {
-      totalCourses: defaultTeacherCourses.length,
-      studentTotal: 0,
-      averageRate: "0%"
+  termOptions: ["2025秋季学期", "2025春季学期", "2024秋季学期"],
+  termIndex: 0,
+  stats: {
+    totalCourses: defaultTeacherCourses.length,
+    studentTotal: 0,
+    averageRate: "0%"
+    },
+    teacherProfile: {
+      name: "李明",
+      title: "计算机科学与技术 · 讲师",
+      schoolYear: "2025秋季学期",
+      avatarText: "李"
     }
   },
   onShow() {
+    this.syncProfile();
     this.loadCourses();
+  },
+  syncProfile() {
+    const app = getApp();
+    const profile = (app.globalData && app.globalData.userProfile) || null;
+    if (profile) {
+      this.setData({
+        teacherProfile: {
+          name: profile.name || profile.username || "教师",
+          title: profile.title || profile.major || "任课教师",
+          schoolYear: this.data.termOptions[this.data.termIndex] || "",
+          avatarText: (profile.name && profile.name[0]) || "教"
+        }
+      });
+    }
   },
   handleInput(event) {
     this.setData({ keyword: event.detail.value }, () => this.applyFilters());
@@ -52,6 +73,17 @@ Page({
     wx.navigateTo({
       url: `/subpackages/teacher/pages/course-detail/index?courseId=${id}&courseName=${encodeURIComponent(name || "")}`
     });
+  },
+  handleApproveLeave() {
+    wx.navigateTo({
+      url: "/subpackages/teacher/pages/approval/index"
+    });
+  },
+  handleMessages() {
+    wx.navigateTo({ url: "/pages/messages/index" });
+  },
+  handleProfile() {
+    wx.navigateTo({ url: "/pages/profile/index" });
   },
   loadCourses() {
     const db = getDB();

@@ -42,6 +42,7 @@
 
   <view class="card section">
     <view class="title">通知推送</view>
+    <button class="btn" size="mini" type="default" bindtap="handleOpenMessages">打开消息中心</button>
     <input class="input" placeholder="通知标题" value="{{notifyTitle}}" data-field="notifyTitle" bindinput="handleNotifyInput" />
     <textarea
       class="textarea"

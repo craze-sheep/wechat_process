@@ -13,6 +13,17 @@
         <view class="student">{{item.student}}</view>
         <view class="type">{{item.type}}</view>
       </view>
+      <view class="status-row status {{item.status}}">
+        {{
+          item.status === 'counselor_pending'
+            ? '辅导员审批'
+            : item.status === 'counselor_approved'
+            ? '已通过，待教师审批'
+            : item.status === 'counselor_rejected'
+            ? '辅导员已驳回'
+            : '待处理'
+        }}
+      </view>
       <view class="meta">课程：{{item.course}}</view>
       <view class="meta">提交：{{item.submittedAt}}</view>
       <view class="meta">理由：{{item.reason}}</view>

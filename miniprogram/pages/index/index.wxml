@@ -1,28 +1,82 @@
 <view class="page">
-  <view class="hero card">
-    <view class="hero-title">智能考勤小程序</view>
-    <view class="hero-desc">选择角色以继续体验相应模块</view>
-    <view class="login-row">
-      <view class="login-text">{{profile ? '欢迎，' + profile.name : '请先登录云端账号'}}</view>
-      <button size="mini" bindtap="handleLogin" loading="{{loggingIn}}">
-        {{loggingIn ? '登录中' : (profile ? '重新登录' : '云端登录')}}
+  <view class="hero">
+    <view class="hero-text">
+      <view class="hero-title">智能考勤</view>
+      <view class="hero-sub">统一账号登录，系统自动进入你的角色端</view>
+      <view class="hero-tip">{{profile ? '当前账号：' + profile.name : '请先登录账号'}}</view>
+      <button class="hero-btn" bindtap="handleLogin" loading="{{loggingIn}}" disabled="{{loggingIn}}">
+        {{loggingIn ? '登录中' : (profile ? '个人信息/退出' : '立即登录')}}
       </button>
+    </view>
+    <view class="hero-visual">
+      <view class="pill">签到 · 补签 · 预警</view>
+      <view class="pill pill-light">教师 / 学生 / 管理</view>
     </view>
   </view>
 
-  <view class="role-list">
-    <block wx:for="{{roles}}" wx:key="key">
-      <view class="role-card card" data-role="{{item.key}}" bindtap="handleRoleTap">
-        <view class="role-header">
-          <view class="role-title">{{item.title}}</view>
-          <view class="role-badge {{item.status === 'ready' ? 'badge-ready' : 'badge-todo'}}">{{item.badge}}</view>
-        </view>
-        <view class="role-desc">{{item.subtitle}}</view>
-        <view class="role-footer">
-          <view class="status-dot {{item.status}}"></view>
-          <view class="status-text">{{item.status === 'ready' ? '可体验' : '开发中'}}</view>
-        </view>
+  <view class="card login-card">
+    <view class="login-header">
+      <view class="login-badge">考勤</view>
+      <view>
+        <view class="login-title">账号登录</view>
+        <view class="login-desc">输入账号密码进入智能考勤</view>
       </view>
-    </block>
+    </view>
+    <view class="field">
+      <view class="label">账号</view>
+      <input
+        class="input"
+        placeholder="请输入账号"
+        placeholder-style="color:#9ca3af;"
+        value="{{username}}"
+        data-field="username"
+        bindinput="handleInput"
+      />
+    </view>
+    <view class="field">
+      <view class="label">密码</view>
+      <view class="password-row">
+        <input
+          class="input"
+          placeholder="请输入密码"
+          placeholder-style="color:#9ca3af;"
+          password="{{!showPassword}}"
+          value="{{password}}"
+          data-field="password"
+          bindinput="handleInput"
+          confirm-type="done"
+          bindconfirm="handleSubmit"
+        />
+        <text class="eye" bindtap="togglePassword">{{showPassword ? '🙈' : '👁️'}}</text>
+      </view>
+    </view>
+    <view class="error" wx:if="{{loginError}}">{{loginError}}</view>
+    <button
+      class="primary"
+      loading="{{loggingIn}}"
+      disabled="{{loggingIn || !canSubmit}}"
+      bindtap="handleSubmit"
+    >
+      {{loggingIn ? '登录中...' : '登录'}}
+    </button>
+  </view>
+
+  <view class="hint card">
+    <view class="hint-title">登录后会发生什么？</view>
+    <view class="hint-desc">账号已绑定角色（学生/教师/辅导员/管理员），登录即可直达对应首页，不需要提前选角色。</view>
+    <view class="hint-steps">
+      <view class="step">
+        <view class="dot">1</view>
+        <view class="text">输入分配的账号密码</view>
+      </view>
+      <view class="step">
+        <view class="dot">2</view>
+        <view class="text">系统识别角色并跳转对应端</view>
+      </view>
+      <view class="step">
+        <view class="dot">3</view>
+        <view class="text">体验对应功能：签到、监控、预警、配置等</view>
+      </view>
+    </view>
   </view>
 </view>

@@ -53,7 +53,23 @@
       <view class="record-header">
         <view class="course">{{item.course}}</view>
         <view class="status {{item.status}}">
-          {{ item.status === 'approved' ? '已通过' : item.status === 'pending' ? '待审批' : '已驳回' }}
+          {{
+            item.status === 'counselor_pending'
+              ? '辅导员审批'
+              : item.status === 'counselor_approved'
+              ? '待教师审批'
+              : item.status === 'counselor_rejected'
+              ? '辅导员驳回'
+              : item.status === 'teacher_approved'
+              ? '老师已通过'
+              : item.status === 'teacher_rejected'
+              ? '老师驳回'
+              : item.status === 'approved'
+              ? '已通过'
+              : item.status === 'pending'
+              ? '待审批'
+              : '已驳回'
+          }}
         </view>
       </view>
       <view class="detail">{{item.date}} · {{item.reason}}</view>

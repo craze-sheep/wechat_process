@@ -1,0 +1,33 @@
+<view class="page">
+  <view class="header">
+    <view class="title">消息中心</view>
+    <view class="subtitle">查看通知与签到提醒</view>
+  </view>
+
+  <view wx:if="{{loading}}" class="state">加载中...</view>
+  <view wx:if="{{error && !loading}}" class="state">
+    {{error}}
+    <button size="mini" bindtap="handleRetry">重试</button>
+  </view>
+
+  <view wx:if="{{!loading && !error && (!items || !items.length)}}" class="state">
+    暂无消息
+  </view>
+
+  <scroll-view wx:if="{{!loading && items && items.length}}" class="list" scroll-y="true">
+    <view
+      wx:for="{{items}}"
+      wx:key="id"
+      class="item {{item.read ? 'read' : 'unread'}}"
+      data-id="{{item.id}}"
+      bindtap="handleMarkRead"
+    >
+      <view class="item-title">{{item.title}}</view>
+      <view class="item-content">{{item.content}}</view>
+      <view class="item-meta">
+        <text class="tag">{{item.targetRole === 'all' ? '全体' : item.targetRole}}</text>
+        <text class="time">{{item.displayTime}}</text>
+      </view>
+    </view>
+  </scroll-view>
+</view>

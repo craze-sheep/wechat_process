@@ -11,39 +11,22 @@ Page({
   data: {
     loggingIn: false,
     profile: null,
-    roles: [
-      {
-        key: "student",
-        title: "学生端",
-        subtitle: "今日课程 / 签到 / 补签",
-        badge: "核心体验",
-        status: "ready"
-      },
-      {
-        key: "teacher",
-        title: "教师端",
-        subtitle: "发起签到 / 实时监控 / 审批",
-        badge: "核心体验",
-        status: "ready"
-      },
-      {
-        key: "counselor",
-        title: "辅导员端",
-        subtitle: "出勤大盘 / 预警 / 跟进",
-        badge: "新上线",
-        status: "ready"
-      },
-      {
-        key: "admin",
-        title: "管理员端",
-        subtitle: "用户 / 课程 / 系统配置",
-        badge: "新上线",
-        status: "ready"
-      }
-    ]
+    loginError: "",
+    username: "",
+    password: "",
+    showPassword: false,
+    canSubmit: false
+  },
+  redirecting: false,
+  onLoad() {
+    const last = wx.getStorageSync("lastUsername");
+    if (last) {
+      this.setData({ username: last }, () => this.updateCanSubmit());
+    }
   },
   onShow() {
     this.syncProfile();
+    this.ensureSession();
   },
   syncProfile() {
     const app = getApp();
@@ -51,41 +34,129 @@ Page({
       profile: (app.globalData && app.globalData.userProfile) || null
     });
   },
-  handleLogin() {
-    if (this.data.loggingIn) return;
-    this.setData({ loggingIn: true });
+  ensureSession() {
+    if (this.redirecting || this.data.loggingIn) return;
+    const app = getApp();
+    const profile = (app.globalData && app.globalData.userProfile) || null;
+    const token = (app.globalData && app.globalData.token) || wx.getStorageSync("token");
+    const role = (profile && profile.role) || (app.globalData && app.globalData.role);
+    if (!token) {
+      this.setData({ profile: null, loginError: "" });
+      return;
+    }
+    if (profile && role) {
+      this.redirectIfLogged();
+      return;
+    }
+    this.setData({ loggingIn: true, loginError: "" });
     authService
       .login()
-      .then((profile) => {
-        const app = getApp();
-        if (app.setUserProfile) app.setUserProfile(profile);
-        if (profile.role && app.setRole) app.setRole(profile.role);
-        if (profile.token && app.setToken) app.setToken(profile.token);
-        this.setData({ profile });
-        wx.showToast({ title: "登录成功", icon: "success" });
+      .then((freshProfile) => {
+        if (app.setUserProfile) app.setUserProfile(freshProfile);
+        if (freshProfile?.role && app.setRole) app.setRole(freshProfile.role);
+        if (freshProfile?.token && app.setToken) app.setToken(freshProfile.token);
+        this.setData({ profile: freshProfile, loginError: "" });
+        this.redirectIfLogged();
       })
       .catch((err) => {
-        wx.showToast({ title: err.message || "登录失败", icon: "none" });
+        const message = err?.message || "会话已失效，请重新登录";
+        this.setData({ loginError: message, profile: null });
+        if (app.clearAuth) app.clearAuth();
+        wx.showToast({ title: message, icon: "none" });
       })
       .finally(() => {
         this.setData({ loggingIn: false });
       });
   },
-  handleRoleTap(event) {
-    const role = event.currentTarget.dataset.role;
-    if (!role) return;
-    const route = roleRouteMap[role];
-    if (!route) {
-      wx.showToast({
-        title: "即将上线",
-        icon: "none"
-      });
+  redirectIfLogged() {
+    if (this.redirecting) return;
+    const app = getApp();
+    const profile = (app.globalData && app.globalData.userProfile) || this.data.profile || null;
+    const role = (profile && profile.role) || (app.globalData && app.globalData.role);
+    const token = (app.globalData && app.globalData.token) || wx.getStorageSync("token");
+    if (!token || !profile || !role) return;
+    const route = roleRouteMap[role] || roleRouteMap.student;
+      this.redirecting = true;
+    wx.reLaunch({
+      url: route,
+      complete: () => {
+        this.redirecting = false;
+      },
+      fail: (err) => {
+        this.redirecting = false;
+        console.warn("redirect failed", err);
+        wx.showToast({
+          title: "跳转失败，请重试",
+          icon: "none"
+        });
+      }
+    });
+  },
+  updateCanSubmit() {
+    const username = (this.data.username || "").trim();
+    const password = (this.data.password || "").trim();
+    const canSubmit = !!username && !!password;
+    if (canSubmit !== this.data.canSubmit) {
+      this.setData({ canSubmit });
+    }
+  },
+  handleInput(event) {
+    const field = event.currentTarget.dataset.field;
+    this.setData(
+      {
+        [field]: event.detail.value
+      },
+      () => this.updateCanSubmit()
+    );
+  },
+  togglePassword() {
+    this.setData({ showPassword: !this.data.showPassword });
+  },
+  handleSubmit() {
+    if (this.data.loggingIn) {
+      wx.showToast({ title: "正在登录...", icon: "none" });
       return;
     }
-    const app = getApp();
-    if (app.setRole) app.setRole(role);
-    wx.navigateTo({
-      url: route
-    });
+    const username = (this.data.username || "").trim();
+    const password = (this.data.password || "").trim();
+    if (!username || !password) {
+      this.setData({ loginError: "请输入账号和密码" });
+      wx.showToast({ title: "请输入账号和密码", icon: "none" });
+      return;
+    }
+    this.setData({ loggingIn: true, loginError: "" });
+    wx.showLoading({ title: "登录中", mask: true });
+    authService
+      .loginWithPassword({ username, password })
+      .then((profile) => {
+        const app = getApp();
+        if (app.setUserProfile) app.setUserProfile(profile);
+        if (profile.role && app.setRole) app.setRole(profile.role);
+        if (profile.token && app.setToken) app.setToken(profile.token);
+        wx.setStorageSync("lastUsername", username);
+        this.setData({ profile });
+        wx.showToast({ title: "登录成功", icon: "success" });
+        setTimeout(() => {
+          this.redirectIfLogged();
+        }, 150);
+      })
+      .catch((err) => {
+        const message = err?.message || "登录失败";
+        this.setData({ loginError: message });
+        wx.showToast({ title: message, icon: "none" });
+      })
+      .finally(() => {
+        wx.hideLoading();
+        this.setData({ loggingIn: false });
+        this.updateCanSubmit();
+      });
+  },
+  handleLogin() {
+    if (this.data.loggingIn || this.redirecting) return;
+    if (this.data.profile) {
+      wx.navigateTo({ url: "/pages/profile/index" });
+      return;
+    }
+    this.handleSubmit();
   }
 });

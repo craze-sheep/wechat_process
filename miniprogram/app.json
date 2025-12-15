@@ -1,7 +1,10 @@
 {
   "cloud": true,
   "pages": [
-    "pages/index/index"
+    "pages/index/index",
+    "pages/login/index",
+    "pages/profile/index",
+    "pages/messages/index"
   ],
   "subPackages": [
     {

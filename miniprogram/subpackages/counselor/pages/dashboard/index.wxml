@@ -4,8 +4,10 @@
     <view class="subtitle">整体出勤率 {{overview.overallRate}}</view>
     <view class="meta">较上周 {{overview.trend}}</view>
     <view class="head-actions">
+      <button size="mini" bindtap="handleMessages">消息</button>
       <button size="mini" bindtap="handleViewAlerts">查看预警</button>
       <button size="mini" type="primary" bindtap="handleQuickMakeup">特殊补签</button>
+      <button size="mini" bindtap="handleLeaveApproval">请假审批</button>
     </view>
   </view>
 

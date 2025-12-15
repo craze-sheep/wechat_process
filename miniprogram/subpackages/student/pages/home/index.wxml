@@ -5,9 +5,12 @@
         <view class="profile-name">{{profile.name}}</view>
         <view class="profile-desc">{{profile.major}} · {{profile.studentNo}}</view>
       </view>
-      <button size="mini" class="switch-role" bindtap="handleRefresh">
-        {{refreshing ? '刷新中...' : '刷新'}}
-      </button>
+      <view class="profile-actions">
+        <button size="mini" class="switch-role" bindtap="handleRefresh">
+          {{refreshing ? '刷新中...' : '刷新'}}
+        </button>
+        <button size="mini" class="profile-btn" bindtap="handleProfile">个人信息</button>
+      </view>
     </view>
   </view>
 
@@ -88,6 +91,10 @@
   </view>
 
   <section-header title="签到提醒" action-text="订阅提醒" bindaction="handleSubscribe"></section-header>
+  <view wx:if="{{!reminders.length}}" class="reminder empty">
+    <view class="dot"></view>
+    <view class="text">暂无提醒</view>
+  </view>
   <view wx:for="{{reminders}}" wx:key="id" class="reminder {{item.type}}">
     <view class="dot"></view>
     <view class="text">{{item.text}}</view>

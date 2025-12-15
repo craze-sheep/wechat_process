@@ -8,6 +8,16 @@ App({
     cloudEnvId: defaultCloudEnv || "",
     userProfile: null
   },
+  clearAuth() {
+    this.globalData = {
+      ...this.globalData,
+      role: "",
+      token: "",
+      userProfile: null
+    };
+    wx.removeStorageSync("token");
+    wx.removeStorageSync("userRole");
+  },
   onLaunch() {
     const storedRole = wx.getStorageSync("userRole");
     if (storedRole) this.globalData.role = storedRole;
