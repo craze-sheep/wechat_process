@@ -1,10 +1,18 @@
 const adminService = require("../../../../common/services/admin");
-const { adminOverviewMock } = require("../../../../common/mock/admin");
 const XLSX = require("../../../../common/utils/xlsx");
+
+const defaultOverview = {
+  userTotal: 0,
+  teacherTotal: 0,
+  counselorTotal: 0,
+  pendingApprovals: 0,
+  services: [],
+  logs: []
+};
 
 Page({
   data: {
-    overview: adminOverviewMock,
+    overview: defaultOverview,
     logs: [],
     loading: false,
     bulkLoading: false,
@@ -14,7 +22,7 @@ Page({
     messages: [],
     importing: false,
     exporting: false,
-    serviceStatus: adminOverviewMock.services || []
+    serviceStatus: defaultOverview.services
   },
   onShow() {
     this.loadOverview();
@@ -26,16 +34,16 @@ Page({
       .fetchOverview()
       .then((data) => {
         this.setData({
-          overview: data || adminOverviewMock,
-          logs: (data && data.logs) || [],
-          serviceStatus: (data && data.services) || adminOverviewMock.services || []
+          overview: data || defaultOverview,
+          logs: (data && data.logs) || defaultOverview.logs,
+          serviceStatus: (data && data.services) || defaultOverview.services
         });
       })
       .catch(() => {
         this.setData({
-          overview: adminOverviewMock,
-          logs: adminOverviewMock.logs || [],
-          serviceStatus: adminOverviewMock.services || []
+          overview: defaultOverview,
+          logs: defaultOverview.logs,
+          serviceStatus: defaultOverview.services
         });
       })
       .finally(() => this.setData({ loading: false }));

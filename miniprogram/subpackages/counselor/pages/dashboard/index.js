@@ -1,9 +1,21 @@
 const counselorService = require("../../../../common/services/counselor");
-const { overviewMock } = require("../../../../common/mock/counselor");
+const defaultOverview = {
+  grade: "2022级计科",
+  overallRate: "93%",
+  lateCount: 5,
+  absentCount: 2,
+  alerts: 4,
+  trend: "+1.5%",
+  classes: [
+    { name: "计科 2201", rate: "95%", status: "good" },
+    { name: "计科 2202", rate: "90%", status: "warn" },
+    { name: "计科 2203", rate: "88%", status: "risk" }
+  ]
+};
 
 Page({
   data: {
-    overview: overviewMock,
+    overview: defaultOverview,
     loading: false,
     gradeOptions: ["2022级", "2023级", "2024级"],
     majorOptions: ["计算机科学", "软件工程", "信息安全"],
@@ -27,7 +39,7 @@ Page({
         }
       })
       .catch(() => {
-        this.setData({ overview: overviewMock });
+        this.setData({ overview: defaultOverview });
       })
       .finally(() => {
         this.setData({ loading: false });

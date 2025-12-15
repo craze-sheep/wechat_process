@@ -1,10 +1,31 @@
-const { signMonitorMock } = require("../../../../common/mock/teacher");
+const defaultSignMonitor = {
+  batchId: "batch-123",
+  courseName: "高等数学",
+  total: 62,
+  signed: 49,
+  qrExpiredIn: 25,
+  mode: "标准模式",
+  qrRefreshInterval: 30,
+  autoCloseMinutes: 15,
+  studentsSigned: [
+    { name: "李明", status: "正常", time: "08:05" },
+    { name: "王强", status: "迟到", time: "08:11" }
+  ],
+  studentsPending: [
+    { name: "赵敏", status: "未签到" },
+    { name: "陈阳", status: "未签到" }
+  ],
+  abnormal: [
+    { name: "周九", reason: "定位失败 3 次" },
+    { name: "郑十", reason: "人脸识别失败 2 次" }
+  ]
+};
 const attendanceService = require("../../../../common/services/attendance");
 
 Page({
   data: {
     batchId: "",
-    monitor: signMonitorMock,
+    monitor: defaultSignMonitor,
     refreshing: false,
     progress: 0,
     activeTab: "signed",
@@ -16,7 +37,7 @@ Page({
   },
   onLoad(options) {
     this.setData({
-      batchId: (options && options.batchId) || signMonitorMock.batchId,
+      batchId: (options && options.batchId) || defaultSignMonitor.batchId,
       monitor: {
         ...this.data.monitor,
         courseName: decodeURIComponent((options && options.courseName) || this.data.monitor.courseName)
@@ -32,8 +53,8 @@ Page({
     ])
       .then(([batch, detail]) => {
         if (!batch) return;
-        const signedList = (detail && detail.signed) || signMonitorMock.studentsSigned;
-        const pendingList = (detail && detail.pending) || signMonitorMock.studentsPending;
+        const signedList = (detail && detail.signed) || defaultSignMonitor.studentsSigned;
+        const pendingList = (detail && detail.pending) || defaultSignMonitor.studentsPending;
         this.setData(
           {
             monitor: {
@@ -59,7 +80,7 @@ Page({
       })
       .catch(() => {
         wx.showToast({ title: "批次数据获取失败，已使用示例数据", icon: "none" });
-        this.setData({ monitor: signMonitorMock, progress: this.calculateProgress(signMonitorMock) });
+        this.setData({ monitor: defaultSignMonitor, progress: this.calculateProgress(defaultSignMonitor) });
       })
       .finally(() => {
         this.setData({ refreshing: false });

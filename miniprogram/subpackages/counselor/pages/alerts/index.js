@@ -1,10 +1,35 @@
 const counselorService = require("../../../../common/services/counselor");
-const { alertsMock } = require("../../../../common/mock/counselor");
+const defaultAlerts = [
+  {
+    id: "alert-001",
+    student: "张晓",
+    clazz: "计科 2202",
+    reason: "连续缺勤 3 次",
+    level: "serious",
+    lastAbsence: "11-10 算法设计"
+  },
+  {
+    id: "alert-002",
+    student: "王凯",
+    clazz: "计科 2201",
+    reason: "缺勤率 28%",
+    level: "warning",
+    lastAbsence: "11-12 数据结构"
+  },
+  {
+    id: "alert-003",
+    student: "李倩",
+    clazz: "计科 2203",
+    reason: "近期缺勤上升",
+    level: "warning",
+    lastAbsence: "11-11 英语"
+  }
+];
 
 Page({
   data: {
-    list: alertsMock,
-    displayList: alertsMock,
+    list: defaultAlerts,
+    displayList: defaultAlerts,
     loading: false,
     selecting: false,
     selectedIds: [],
@@ -22,11 +47,11 @@ Page({
         if (data && data.length) {
           this.setData({ list: data, displayList: data });
         } else {
-          this.setData({ list: alertsMock, displayList: alertsMock });
+          this.setData({ list: defaultAlerts, displayList: defaultAlerts });
         }
       })
       .catch(() => {
-        this.setData({ list: alertsMock, displayList: alertsMock });
+        this.setData({ list: defaultAlerts, displayList: defaultAlerts });
       })
       .finally(() => {
         this.setData({ loading: false });

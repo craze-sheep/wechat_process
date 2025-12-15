@@ -1,4 +1,21 @@
-const { approvalListMock } = require("../../../../common/mock/teacher");
+const defaultApprovalList = [
+  {
+    id: "mk-002",
+    student: "李明",
+    course: "数据结构",
+    reason: "发烧请假",
+    submittedAt: "11-11 21:30",
+    status: "pending"
+  },
+  {
+    id: "mk-003",
+    student: "王强",
+    course: "高等数学",
+    reason: "比赛外出",
+    submittedAt: "11-10 08:12",
+    status: "pending"
+  }
+];
 const makeupService = require("../../../../common/services/makeup");
 
 const formatDateTime = (timestamp) => {
@@ -9,8 +26,8 @@ const formatDateTime = (timestamp) => {
 
 Page({
   data: {
-    approvals: approvalListMock,
-    displayApprovals: approvalListMock,
+    approvals: defaultApprovalList,
+    displayApprovals: defaultApprovalList,
     loading: false,
     statusOptions: ["全部", "待审批", "已通过", "已驳回"],
     statusIndex: 0,
@@ -65,7 +82,7 @@ Page({
                 evidence: item.evidence || "",
                 type: item.type || "病假"
               }))
-            : approvalListMock;
+            : defaultApprovalList;
         const courseOptions = ["全部课程", ...Array.from(new Set(normalized.map((item) => item.course)))];
         this.setData(
           {
@@ -76,7 +93,7 @@ Page({
         );
       })
       .catch(() => {
-        this.setData({ approvals: approvalListMock, displayApprovals: approvalListMock });
+        this.setData({ approvals: defaultApprovalList, displayApprovals: defaultApprovalList });
       })
       .finally(() => this.setData({ loading: false }));
   },

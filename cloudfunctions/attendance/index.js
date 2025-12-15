@@ -7,6 +7,29 @@ cloud.init({
 const db = cloud.database();
 const _ = db.command;
 
+const EARTH_RADIUS = 6371000;
+
+const toRadians = (value) => (value * Math.PI) / 180;
+
+const computeDistanceMeters = (lat1, lon1, lat2, lon2) => {
+  if ([lat1, lon1, lat2, lon2].some((coord) => typeof coord !== "number")) {
+    return null;
+  }
+  const dLat = toRadians(lat2 - lat1);
+  const dLon = toRadians(lon2 - lon1);
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(toRadians(lat1)) * Math.cos(toRadians(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return EARTH_RADIUS * c;
+};
+
+const isWithinRadius = (batchLocation, distance) => {
+  if (!batchLocation || typeof distance !== "number") return true;
+  const range = typeof batchLocation.radius === "number" ? batchLocation.radius : 50;
+  return distance <= range;
+};
+
 const success = (data = null) => ({
   code: 0,
   data
@@ -130,7 +153,8 @@ const mapRecord = (record) => ({
 });
 
 exports.main = async (event) => {
-  const { action } = event;
+  console.log("[attendance] event payload", event);
+  const action = event?.action || event?.data?.action;
   if (!action) {
     return failure("action 不能为空", 400);
   }
@@ -172,23 +196,70 @@ exports.main = async (event) => {
       case "submitRecord": {
         const payload = event.payload || {};
         if (!payload.batchId) {
-          return failure("batchId 必填", 400);
+          return failure("batchId 参数必填", 400);
         }
         const { OPENID } = cloud.getWXContext();
         const user = (await getUserByOpenid(event.openid || OPENID)) || {};
-        const batch = (await getBatchDoc(payload.batchId)) || {};
+        const batchDoc = await getBatchDoc(payload.batchId);
+        if (!batchDoc) {
+          return failure("签到批次不存在", 404);
+        }
+        const batch = await ensureAutoClose(batchDoc);
+        if (batch?.status === "closed") {
+          return failure("签到已结束", 400);
+        }
+        if (!payload.verify?.qr) {
+          return failure("请完成二维码验证", 400);
+        }
+        if (batch?.mode === "高安全模式" && !payload.verify?.face) {
+          return failure("当前策略要求完成活体识别", 400);
+        }
+        const locationPayload = payload.verify?.location || null;
+        let distance = null;
+        if (
+          batch?.location &&
+          typeof locationPayload?.latitude === "number" &&
+          typeof locationPayload?.longitude === "number"
+        ) {
+          const calculated = computeDistanceMeters(
+            batch.location.latitude,
+            batch.location.longitude,
+            locationPayload.latitude,
+            locationPayload.longitude
+          );
+          distance = typeof calculated === "number" ? Math.round(calculated) : null;
+        } else if (locationPayload && typeof locationPayload.distance === "number") {
+          distance = Math.round(locationPayload.distance);
+        }
+        if (batch?.location) {
+          if (!locationPayload || distance === null) {
+            return failure("需要定位信息以完成签到", 400);
+          }
+          if (!isWithinRadius(batch.location, distance)) {
+            return failure("当前定位不在签到范围内", 400);
+          }
+        }
         const now = Date.now();
         const recordId = payload.recordId || `record-${now}`;
+        const sanitizedVerify = {
+          ...payload.verify,
+          location: locationPayload
+            ? {
+                latitude: locationPayload.latitude,
+                longitude: locationPayload.longitude,
+                distance
+              }
+            : undefined
+        };
         const data = {
-          _id: recordId,
           recordId,
           batchId: payload.batchId,
-          courseId: payload.courseId || batch.courseId || "",
-          courseName: payload.courseName || batch.courseName || "",
+          courseId: payload.courseId || batch?.courseId || "",
+          courseName: payload.courseName || batch?.courseName || "",
           studentId: payload.studentId || user._id || "",
           studentName: payload.studentName || user.name || "",
           status: payload.status || "normal",
-          verify: payload.verify || {},
+          verify: sanitizedVerify,
           signedAt: now
         };
         await recordCollection.doc(recordId).set({ data });
@@ -197,7 +268,8 @@ exports.main = async (event) => {
           .update({
             data: {
               signed: _.inc(1),
-              updatedAt: now
+              updatedAt: now,
+              lastSignedAt: now
             }
           })
           .catch(() => null);

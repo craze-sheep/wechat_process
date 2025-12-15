@@ -1,10 +1,9 @@
 const adminService = require("../../../../common/services/admin");
-const { adminUsersMock } = require("../../../../common/mock/admin");
 
 Page({
   data: {
-    list: adminUsersMock,
-    displayList: adminUsersMock,
+    list: [],
+    displayList: [],
     filter: "",
     loading: false
   },
@@ -21,14 +20,14 @@ Page({
     adminService
       .listUsers()
       .then((data) => {
-        const list = data && data.length ? data : adminUsersMock;
+        const list = data && data.length ? data : [];
         this.setData({
           list,
           displayList: list
         });
       })
       .catch(() => {
-        this.setData({ list: adminUsersMock, displayList: adminUsersMock });
+        this.setData({ list: [], displayList: [] });
       })
       .finally(() => this.setData({ loading: false }));
   },

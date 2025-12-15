@@ -73,7 +73,8 @@ const formatTime = (timestamp) => {
 };
 
 exports.main = async (event) => {
-  const { action } = event;
+  console.log("[admin] event payload", event);
+  const action = event?.action || event?.data?.action || "overview";
   if (!action) {
     return failure("action 不能为空", 400);
   }

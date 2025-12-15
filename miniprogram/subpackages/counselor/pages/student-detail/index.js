@@ -1,10 +1,33 @@
 const counselorService = require("../../../../common/services/counselor");
-const { studentDetailMock } = require("../../../../common/mock/counselor");
+const defaultStudentDetail = {
+  base: {
+    name: "张晓",
+    clazz: "计科 2202",
+    phone: "138****1234",
+    guardian: "父亲 / 139****8888"
+  },
+  stats: {
+    total: 42,
+    normal: 34,
+    late: 4,
+    absent: 4,
+    makeup: 2
+  },
+  followups: [
+    { time: "2025-11-05 14:00", content: "电话联系家长，说明考勤情况", owner: "辅导员" },
+    { time: "2025-11-08 09:30", content: "与学生面谈，确认近期压力大", owner: "辅导员" }
+  ],
+  timeline: [
+    { course: "高等数学", date: "11-10", status: "缺勤" },
+    { course: "计算机网络", date: "11-08", status: "迟到" },
+    { course: "英语", date: "11-06", status: "补签通过" }
+  ]
+};
 
 Page({
   data: {
     studentId: "",
-    detail: studentDetailMock,
+    detail: defaultStudentDetail,
     loading: false,
     followupText: "",
     followupLoading: false
@@ -23,11 +46,11 @@ Page({
         if (data) {
           this.setData({ detail: data });
         } else {
-          this.setData({ detail: studentDetailMock });
+          this.setData({ detail: defaultStudentDetail });
         }
       })
       .catch(() => {
-        this.setData({ detail: studentDetailMock });
+        this.setData({ detail: defaultStudentDetail });
       })
       .finally(() => {
         this.setData({ loading: false });

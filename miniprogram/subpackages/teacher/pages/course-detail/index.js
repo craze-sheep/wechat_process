@@ -1,6 +1,25 @@
 const attendanceService = require("../../../../common/services/attendance");
 const { getDB } = require("../../../../common/services/cloud");
-const { teacherCoursesMock } = require("../../../../common/mock/teacher");
+const defaultTeacherCourses = [
+  {
+    id: "course-001",
+    name: "高等数学",
+    clazz: "计科 2001",
+    schedule: "周一 08:00-09:40",
+    location: "教学楼 A201",
+    attendanceRate: "96%"
+  },
+  {
+    id: "course-002",
+    name: "数据结构",
+    clazz: "计科 2002",
+    schedule: "周三 10:00-11:40",
+    location: "实验楼 305",
+    attendanceRate: "92%"
+  }
+];
+
+const defaultCourseDetail = defaultTeacherCourses[0];
 const XLSX = require("../../../../common/utils/xlsx");
 
 const formatDateTime = (timestamp) => {
@@ -53,8 +72,8 @@ Page({
             .doc(this.data.courseId)
             .get()
             .then((res) => res.data)
-            .catch(() => teacherCoursesMock[0])
-        : Promise.resolve(teacherCoursesMock[0]);
+            .catch(() => defaultTeacherCourses[0])
+        : Promise.resolve(defaultTeacherCourses[0]);
     Promise.all([coursePromise, attendanceService.listRecords({ courseId: this.data.courseId })])
       .then(([course, listResult]) => {
         const rawRecords = Array.isArray(listResult) ? listResult : listResult?.signed || [];
@@ -75,7 +94,7 @@ Page({
       })
       .catch(() => {
         this.setData({
-          detail: teacherCoursesMock[0],
+          detail: defaultTeacherCourses[0],
           stats: {
             total: 0,
             normal: 0,

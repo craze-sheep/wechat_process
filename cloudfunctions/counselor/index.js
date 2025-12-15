@@ -238,7 +238,9 @@ const buildStudentDetail = async (studentId) => {
 };
 
 exports.main = async (event) => {
-  const { action, studentId } = event;
+  console.log("[counselor] event payload", event);
+  const action = event?.action || event?.data?.action;
+  const studentId = event?.studentId;
   if (!action) {
     return failure("action 不能为空", 400);
   }

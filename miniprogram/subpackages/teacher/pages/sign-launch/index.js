@@ -1,4 +1,26 @@
-const { signLaunchDefaults, teacherCoursesMock } = require("../../../../common/mock/teacher");
+const defaultSignLaunchDefaults = {
+  range: 50,
+  duration: 10,
+  mode: "标准模式",
+  lateBuffer: 5
+};
+
+const defaultTeacherCourses = [
+  {
+    id: "course-001",
+    name: "高等数学",
+    clazz: "计科 2001",
+    schedule: "周一 08:00-09:40",
+    location: "教学楼 A201"
+  },
+  {
+    id: "course-002",
+    name: "数据结构",
+    clazz: "计科 2002",
+    schedule: "周三 10:00-11:40",
+    location: "实验楼 305"
+  }
+];
 const attendanceService = require("../../../../common/services/attendance");
 const { getDB } = require("../../../../common/services/cloud");
 
@@ -8,10 +30,10 @@ Page({
     courseName: "",
     modes: ["高安全模式", "标准模式", "便捷模式"],
     form: {
-      mode: signLaunchDefaults.mode,
-      duration: signLaunchDefaults.duration,
-      range: signLaunchDefaults.range,
-      lateBuffer: signLaunchDefaults.lateBuffer,
+      mode: defaultSignLaunchDefaults.mode,
+      duration: defaultSignLaunchDefaults.duration,
+      range: defaultSignLaunchDefaults.range,
+      lateBuffer: defaultSignLaunchDefaults.lateBuffer,
       qrRefreshInterval: 30,
       autoCloseMinutes: 15,
       remark: ""
@@ -54,9 +76,9 @@ Page({
   },
   fallbackCourseInfo() {
     const match =
-      teacherCoursesMock.find(
+      defaultTeacherCourses.find(
         (item) => item.id === this.data.courseId || item.name === this.data.courseName
-      ) || teacherCoursesMock[0];
+      ) || defaultTeacherCourses[0];
     if (!match) return;
     this.setData({
       courseInfo: {

@@ -1,15 +1,32 @@
-const { teacherCoursesMock } = require("../../../../common/mock/teacher");
+const defaultTeacherCourses = [
+  {
+    id: "course-001",
+    name: "高等数学",
+    clazz: "计科 2001",
+    schedule: "周一 08:00-09:40",
+    location: "教学楼 A201",
+    attendanceRate: "96%"
+  },
+  {
+    id: "course-002",
+    name: "数据结构",
+    clazz: "计科 2002",
+    schedule: "周三 10:00-11:40",
+    location: "实验楼 305",
+    attendanceRate: "92%"
+  }
+];
 const { getDB } = require("../../../../common/services/cloud");
 
 Page({
   data: {
-    courses: teacherCoursesMock,
-    displayCourses: teacherCoursesMock,
+    courses: defaultTeacherCourses,
+    displayCourses: defaultTeacherCourses,
     keyword: "",
     termOptions: ["2025秋季学期", "2025春季学期", "2024秋季学期"],
     termIndex: 0,
     stats: {
-      totalCourses: teacherCoursesMock.length,
+      totalCourses: defaultTeacherCourses.length,
       studentTotal: 0,
       averageRate: "0%"
     }
@@ -39,7 +56,7 @@ Page({
   loadCourses() {
     const db = getDB();
     if (!db) {
-      this.setData({ courses: teacherCoursesMock, displayCourses: teacherCoursesMock }, () => this.applyFilters());
+      this.setData({ courses: defaultTeacherCourses, displayCourses: defaultTeacherCourses }, () => this.applyFilters());
       return;
     }
     db.collection("courses")
@@ -47,11 +64,11 @@ Page({
       .then((res) => {
         const data = (res && res.data) || [];
         const courses = data.map((course) => this.normalizeCourse(course));
-        const nextCourses = courses.length ? courses : teacherCoursesMock;
+        const nextCourses = courses.length ? courses : defaultTeacherCourses;
         this.setData({ courses: nextCourses }, () => this.applyFilters());
       })
       .catch(() => {
-        this.setData({ courses: teacherCoursesMock, displayCourses: teacherCoursesMock }, () => this.applyFilters());
+        this.setData({ courses: defaultTeacherCourses, displayCourses: defaultTeacherCourses }, () => this.applyFilters());
       });
   },
   normalizeCourse(course = {}) {

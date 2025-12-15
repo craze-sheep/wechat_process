@@ -84,7 +84,8 @@ const ensureUser = async (openid) => {
 };
 
 exports.main = async (event) => {
-  const { action } = event;
+  console.log("auth event", event);
+  const action = event?.action || event?.data?.action;
   if (!action) {
     return failure("action 不能为空", 400);
   }

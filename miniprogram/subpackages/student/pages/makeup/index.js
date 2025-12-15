@@ -1,4 +1,21 @@
-const { makeupRecordsMock } = require("../../../../common/mock/student");
+const defaultMakeupRecords = [
+  {
+    id: "mk-001",
+    course: "大学英语",
+    date: "2025-11-02",
+    status: "approved",
+    reason: "参加竞赛",
+    approver: "张老师"
+  },
+  {
+    id: "mk-002",
+    course: "线性代数",
+    date: "2025-11-05",
+    status: "pending",
+    reason: "发烧请假",
+    approver: "待审核"
+  }
+];
 const makeupService = require("../../../../common/services/makeup");
 
 const formatDate = (timestamp) => {
@@ -26,7 +43,7 @@ Page({
       evidence: []
     },
     submitting: false,
-    records: makeupRecordsMock,
+    records: defaultMakeupRecords,
     types: ["病假", "事假", "公假", "其他"],
     loadingRecords: false,
     attachments: [],
@@ -101,11 +118,11 @@ Page({
     makeupService
       .listStudentRequests()
       .then((list = []) => {
-        const nextList = list.length ? normalizeRecords(list) : makeupRecordsMock;
+    const nextList = list.length ? normalizeRecords(list) : defaultMakeupRecords;
         this.setData({ records: nextList });
       })
       .catch(() => {
-        this.setData({ records: makeupRecordsMock });
+        this.setData({ records: defaultMakeupRecords });
       })
       .finally(() => this.setData({ loadingRecords: false }));
   },

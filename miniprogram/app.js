@@ -1,9 +1,11 @@
+const { cloudEnvId: defaultCloudEnv } = require("./common/config");
+
 App({
   globalData: {
     role: "student",
     token: "",
     env: "dev",
-    cloudEnvId: "cloud1-8gzerxc2d2e66452",
+    cloudEnvId: defaultCloudEnv || "",
     userProfile: null
   },
   onLaunch() {
@@ -14,6 +16,10 @@ App({
 
     const storedEnv = wx.getStorageSync("cloudEnvId");
     if (storedEnv) this.globalData.cloudEnvId = storedEnv;
+    else if (defaultCloudEnv) {
+      this.globalData.cloudEnvId = defaultCloudEnv;
+      wx.setStorageSync("cloudEnvId", defaultCloudEnv);
+    }
     this.initCloud();
   },
   initCloud() {

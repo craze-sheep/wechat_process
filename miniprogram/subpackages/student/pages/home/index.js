@@ -1,14 +1,65 @@
-const { studentDashboardMock } = require("../../../../common/mock/student");
 const { getDB } = require("../../../../common/services/cloud");
 const attendanceService = require("../../../../common/services/attendance");
 const { subscribeTemplateId } = require("../../../../common/config");
 
+const defaultDashboard = {
+  profile: {
+    name: "李明",
+    major: "计算机科学与技术",
+    studentNo: "2020012345"
+  },
+  stats: {
+    weekAttendance: "95%",
+    lateCount: 1,
+    absentCount: 0,
+    trend: "+2%"
+  },
+  courses: [
+    {
+      id: "course-001",
+      name: "高等数学",
+      teacher: "王老师",
+      time: "08:00-09:40",
+      location: "教学楼 A201",
+      status: "ongoing"
+    },
+    {
+      id: "course-002",
+      name: "数据结构",
+      teacher: "刘老师",
+      time: "10:00-11:40",
+      location: "实验楼 305",
+      status: "upcoming"
+    },
+    {
+      id: "course-003",
+      name: "大学英语",
+      teacher: "张老师",
+      time: "14:00-15:40",
+      location: "综合楼 402",
+      status: "completed"
+    }
+  ],
+  reminders: [
+    {
+      id: "remind-1",
+      text: "10:00 数据结构课程签到将于 15 分钟后开启",
+      type: "info"
+    },
+    {
+      id: "remind-2",
+      text: "上周缺勤 1 次，记得及时提交补签申请",
+      type: "warning"
+    }
+  ]
+};
+
 Page({
   data: {
-    profile: studentDashboardMock.profile,
-    stats: studentDashboardMock.stats,
-    courses: studentDashboardMock.courses,
-    reminders: studentDashboardMock.reminders,
+    profile: defaultDashboard.profile,
+    stats: defaultDashboard.stats,
+    courses: defaultDashboard.courses,
+    reminders: defaultDashboard.reminders,
     historyLoading: false,
     refreshing: false,
     quickActions: [
@@ -30,9 +81,9 @@ Page({
   },
   syncProfile() {
     const app = getApp();
-    this.setData({
-      profile: (app.globalData && app.globalData.userProfile) || studentDashboardMock.profile
-    });
+      this.setData({
+        profile: (app.globalData && app.globalData.userProfile) || defaultDashboard.profile
+      });
   },
   handleCourseTap(event) {
     const id = event.currentTarget.dataset.id;
@@ -123,7 +174,7 @@ Page({
             };
           }) || [];
         this.setData({
-          courses: courses.length ? courses : studentDashboardMock.courses
+          courses: courses.length ? courses : defaultDashboard.courses
         });
       })
       .catch(() => {
@@ -135,12 +186,12 @@ Page({
     this.loadStats();
   },
   useMock() {
-    this.setData({
-      courses: studentDashboardMock.courses,
-      stats: studentDashboardMock.stats,
-      reminders: studentDashboardMock.reminders,
-      refreshing: false
-    });
+      this.setData({
+        courses: defaultDashboard.courses,
+        stats: defaultDashboard.stats,
+        reminders: defaultDashboard.reminders,
+        refreshing: false
+      });
   },
   loadStats() {
     const app = getApp();
@@ -159,14 +210,14 @@ Page({
           { total: 0, normal: 0, late: 0, absent: 0 }
         );
         const weekAttendance =
-          summary.total > 0 ? `${Math.round((summary.normal / summary.total) * 100)}%` : studentDashboardMock.stats.weekAttendance;
-        this.setData({
-          stats: {
-            weekAttendance,
-            lateCount: summary.late,
-            absentCount: summary.absent,
-            trend: studentDashboardMock.stats.trend
-          },
+          summary.total > 0 ? `${Math.round((summary.normal / summary.total) * 100)}%` : defaultDashboard.stats.weekAttendance;
+          this.setData({
+            stats: {
+              weekAttendance,
+              lateCount: summary.late,
+              absentCount: summary.absent,
+              trend: defaultDashboard.stats.trend
+            },
           weeklySummary: {
             normal: summary.normal,
             late: summary.late,
@@ -176,11 +227,11 @@ Page({
       })
       .catch(() => {
         this.setData({
-          stats: studentDashboardMock.stats,
+          stats: defaultDashboard.stats,
           weeklySummary: {
-            normal: studentDashboardMock.stats.normal || 0,
-            late: studentDashboardMock.stats.lateCount,
-            absent: studentDashboardMock.stats.absentCount
+            normal: defaultDashboard.stats.normal || 0,
+            late: defaultDashboard.stats.lateCount,
+            absent: defaultDashboard.stats.absentCount
           }
         });
       });
@@ -188,7 +239,7 @@ Page({
   loadReminders() {
     const db = getDB();
     if (!db) {
-      this.setData({ reminders: studentDashboardMock.reminders });
+      this.setData({ reminders: defaultDashboard.reminders });
       return;
     }
     const _ = db.command;
@@ -206,11 +257,11 @@ Page({
           type: "info"
         }));
         this.setData({
-          reminders: list.length ? list : studentDashboardMock.reminders
+          reminders: list.length ? list : defaultDashboard.reminders
         });
       })
       .catch(() => {
-        this.setData({ reminders: studentDashboardMock.reminders });
+        this.setData({ reminders: defaultDashboard.reminders });
       });
   },
   computeStatus(schedule = {}) {
